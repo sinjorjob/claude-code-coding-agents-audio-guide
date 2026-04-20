@@ -1,0 +1,2359 @@
+{
+  "version": 1,
+  "voice": {
+    "model_id": "5161d41404314212af1254556477c17d",
+    "backend": "s2-pro",
+    "narration_style": "[楽しくわくわくするトーンで]",
+    "piyo_style": "[親しい人にかみ砕いて説明するように、落ち着いた温かい声で]"
+  },
+  "blocks": [
+    {
+      "id": "p001",
+      "type": "piyo",
+      "kind": "piyo",
+      "chapter": "intro",
+      "anchor": {
+        "mode": "before",
+        "ref": "b001"
+      },
+      "text": "どうも、Piyofeed です。今日は、「AI にコードを丸ごと任せる」っていう、ちょっと大胆な話。エンジニアじゃない人も、ちょっと覗いていってみて。「そういう世界が来てるんだ」って空気だけ持って帰ってくれれば、それで十分。",
+      "audio": "audio/p001.mp3",
+      "duration_sec": 17.946,
+      "voice_style": "[温かく]",
+      "prosody": {
+        "speed": 1.05,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b001",
+      "type": "narration",
+      "kind": "h1",
+      "chapter": "intro",
+      "text": "バイブコーディング プロ の 作 法",
+      "audio": "audio/b001.mp3",
+      "duration_sec": 2.508,
+      "voice_style": "[力強く]",
+      "prosody": {
+        "speed": 1.05,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b002",
+      "type": "narration",
+      "kind": "p.subtitle",
+      "chapter": "intro",
+      "text": "Anthropic のリサーチャー Eric 氏による講演。Claude にコードを丸ごと任せる「バイブコーディング」を、どうすれば本番環境で責任を持って実践できるのか。指数関数の波をどう乗りこなすかの完全ガイド。",
+      "audio": "audio/b002.mp3",
+      "duration_sec": 16.039,
+      "voice_style": "[落ち着いて]",
+      "prosody": {
+        "speed": 1.0,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b003",
+      "type": "narration",
+      "kind": "h2",
+      "chapter": "speaker",
+      "text": "話し手について — ギプスの 2 ヶ月で学んだこと",
+      "audio": "audio/b003.mp3",
+      "duration_sec": 4.049,
+      "voice_style": "[明るく]",
+      "prosody": {
+        "speed": 1.05,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b004",
+      "type": "narration",
+      "kind": "p.lead",
+      "chapter": "speaker",
+      "text": "Eric 氏は Anthropic のリサーチャーで、コーディングエージェントの領域を専門としている。Barry Zhang 氏との共著論文「Building Effective Agents」で、Anthropic としてのエージェント設計のサイエンスとベストプラクティスを世に出した人物でもある。",
+      "audio": "audio/b004.mp3",
+      "duration_sec": 15.961,
+      "voice_style": "[熱く]",
+      "prosody": {
+        "speed": 1.1,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b005",
+      "type": "narration",
+      "kind": "p",
+      "chapter": "speaker",
+      "text": "しかし今回のトークのきっかけは、もっと個人的な出来事だった。昨年、自転車通勤中に手を骨折し、2 ヶ月間ギプス生活になった。そのあいだ、彼のコードは——自分の手では一行も書かれなかった。",
+      "audio": "audio/b005.mp3",
+      "duration_sec": 13.923,
+      "voice_style": "[明るく]",
+      "prosody": {
+        "speed": 1.15,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b006",
+      "type": "narration",
+      "kind": "blockquote",
+      "chapter": "speaker",
+      "text": "そのギプスの 2 ヶ月間、僕のコードはすべて Claude が書いていた。",
+      "audio": "audio/b006.mp3",
+      "duration_sec": 6.374,
+      "voice_style": "[感動的に]",
+      "prosody": {
+        "speed": 0.95,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b007",
+      "type": "narration",
+      "kind": "p",
+      "chapter": "speaker",
+      "text": "「どうすればこれを効果的に回せるか」を本気で考えざるを得ない状況に置かれたのだ。そこでの学びは、やがて Anthropic の他プロダクトやモデル本体にも流れ込んでいった。今日のトークは、その 2 ヶ月と、その先にある「本番でのバイブコーディング」の話である。",
+      "audio": "audio/b007.mp3",
+      "duration_sec": 16.875,
+      "voice_style": "[明るく]",
+      "prosody": {
+        "speed": 1.15,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "p002",
+      "type": "piyo",
+      "kind": "piyo",
+      "chapter": "speaker",
+      "anchor": {
+        "mode": "after",
+        "ref": "b007"
+      },
+      "text": "手を骨折した 2 ヶ月、自分は一行もコードを書けないのに、仕事は進んでいく——この経験、想像すると怖いと同時に、ちょっとワクワクもする。人って、できないと分かって初めて、「代わりにやってくれる道具」を本気で信じるんだよね。",
+      "audio": "audio/p002.mp3",
+      "duration_sec": 18.495,
+      "voice_style": "[共感的に]",
+      "prosody": {
+        "speed": 1.05,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b008",
+      "type": "narration",
+      "kind": "p",
+      "chapter": "speaker",
+      "text": "制約は、思考を深くする。怪我という偶然が、Eric 氏を「AI にコードを任せるとはどういうことか」を最前線で考えざるを得ない立場に押し出した。この講演の実感のこもった言葉の源泉は、その 2 ヶ月にある。",
+      "audio": "audio/b008.mp3",
+      "duration_sec": 14.733,
+      "voice_style": "[明るく]",
+      "prosody": {
+        "speed": 1.15,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b009",
+      "type": "narration",
+      "kind": "h2",
+      "chapter": "definition",
+      "text": "バイブコーディングとは — 定義を厳密にしておく",
+      "audio": "audio/b009.mp3",
+      "duration_sec": 3.213,
+      "voice_style": "[明るく]",
+      "prosody": {
+        "speed": 1.05,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b010",
+      "type": "narration",
+      "kind": "p",
+      "chapter": "definition",
+      "text": "まず、言葉の定義から揃えよう。世の中には「AI を大量に使ってコードを書いてもらう＝バイブコーディング」と雑に同一視している人が多い。Eric 氏はそれは違うと言う。",
+      "audio": "audio/b010.mp3",
+      "duration_sec": 12.695,
+      "voice_style": "[明るく]",
+      "prosody": {
+        "speed": 1.15,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b011",
+      "type": "narration",
+      "kind": "p",
+      "chapter": "definition",
+      "text": "Cursor や Copilot を使って、AI が生成するコードを一行ずつ読んで取捨選択している——これはまだタイトなフィードバックループの中にいる。コードを書いているのは人間で、AI は伴走者にすぎない。",
+      "audio": "audio/b011.mp3",
+      "duration_sec": 13.427,
+      "voice_style": "[明るく]",
+      "prosody": {
+        "speed": 1.15,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b012",
+      "type": "narration",
+      "kind": "div.pullquote",
+      "chapter": "definition",
+      "text": "Vibe coding is when you fully give into the vibes, embrace exponentials, and forget that the code even exists.",
+      "audio": "audio/b012.mp3",
+      "duration_sec": 9.456,
+      "voice_style": "[感動的に]",
+      "prosody": {
+        "speed": 0.95,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b013",
+      "type": "narration",
+      "kind": "p",
+      "chapter": "definition",
+      "text": "Andrej Karpathy 氏のこの定義の核心は、最後の一節——「コードが存在することすら忘れる」——にある。Eric 氏が言う「バイブコーディング」も、常にこの意味で使われる。",
+      "audio": "audio/b013.mp3",
+      "duration_sec": 12.225,
+      "voice_style": "[明るく]",
+      "prosody": {
+        "speed": 1.15,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "p003",
+      "type": "piyo",
+      "kind": "piyo",
+      "chapter": "definition",
+      "anchor": {
+        "mode": "after",
+        "ref": "b013"
+      },
+      "text": "「コードがあることすら忘れる」。これ、料理でいうと「レシピがあることすら忘れて、味見だけで仕上げる」くらいのこと。できる人にはすごく効率的、でも慣れないうちはキッチンが大惨事になる——そのへんも、たぶん同じ。",
+      "audio": "audio/p003.mp3",
+      "duration_sec": 16.98,
+      "voice_style": "[親しげに]",
+      "prosody": {
+        "speed": 1.1,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b014",
+      "type": "narration",
+      "kind": "h3",
+      "chapter": "definition",
+      "text": "なぜ世の中がざわついたのか",
+      "audio": "audio/b014.mp3",
+      "duration_sec": 2.273,
+      "voice_style": "[楽しく]",
+      "prosody": {
+        "speed": 1.1,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b015",
+      "type": "narration",
+      "kind": "p",
+      "chapter": "definition",
+      "text": "バイブコーディングが注目を浴びたのは、エンジニアではない人々がコード生成に熱狂しはじめた瞬間だったからだ。Copilot や Cursor は結局エンジニア向けのツールだった。だがバイブコーディングは、コードを書いたことのない人でも、一人でアプリ全体を作り上げる扉を開いてしまった。",
+      "audio": "audio/b015.mp3",
+      "duration_sec": 21.107,
+      "voice_style": "[確信を持って]",
+      "prosody": {
+        "speed": 1.05,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b016",
+      "type": "narration",
+      "kind": "p",
+      "chapter": "definition",
+      "text": "これは多くの人にとって巨大な解放だった——そしてもちろん、巨大な副作用も伴った。",
+      "audio": "audio/b016.mp3",
+      "duration_sec": 7.131,
+      "voice_style": "[明るく]",
+      "prosody": {
+        "speed": 1.15,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "p004",
+      "type": "piyo",
+      "kind": "piyo",
+      "chapter": "definition",
+      "anchor": {
+        "mode": "after",
+        "ref": "b016"
+      },
+      "text": "「コードを書いたことない人が、アプリを作れる」って、すごいことだよね。でも「運転したことない人が、高速を走れる」に近い話でもある。すごい技術には、だいたい運用の作法がくっついてくる。今日の話は、その作法の話。",
+      "audio": "audio/p004.mp3",
+      "duration_sec": 18.259,
+      "voice_style": "[共感的に]",
+      "prosody": {
+        "speed": 1.05,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b017",
+      "type": "narration",
+      "kind": "h2",
+      "chapter": "dangers",
+      "text": "落とし穴と期待値 — なぜ「おもちゃ」にしか見えないのか",
+      "audio": "audio/b017.mp3",
+      "duration_sec": 4.702,
+      "voice_style": "[明るく]",
+      "prosody": {
+        "speed": 1.05,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b018",
+      "type": "narration",
+      "kind": "p",
+      "chapter": "dangers",
+      "text": "副作用の代表例は、SNS をにぎわせた数々の事故である：",
+      "audio": "audio/b018.mp3",
+      "duration_sec": 4.702,
+      "voice_style": "[明るく]",
+      "prosody": {
+        "speed": 1.15,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b019",
+      "type": "narration",
+      "kind": "li",
+      "chapter": "dangers",
+      "text": "API キーの使用量がマックスに張り付く——コード上の不備で際限なく呼び出される",
+      "audio": "audio/b019.mp3",
+      "duration_sec": 5.721,
+      "voice_style": "[テンポ良く]",
+      "prosody": {
+        "speed": 1.2,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b020",
+      "type": "narration",
+      "kind": "li",
+      "chapter": "dangers",
+      "text": "サブスクリプションの課金バイパス——認証や支払いロジックが穴だらけ",
+      "audio": "audio/b020.mp3",
+      "duration_sec": 4.545,
+      "voice_style": "[テンポ良く]",
+      "prosody": {
+        "speed": 1.2,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b021",
+      "type": "narration",
+      "kind": "li",
+      "chapter": "dangers",
+      "text": "DB に得体の知れないデータが生成される——スキーマも権限も曖昧なまま突き進む",
+      "audio": "audio/b021.mp3",
+      "duration_sec": 5.877,
+      "voice_style": "[テンポ良く]",
+      "prosody": {
+        "speed": 1.2,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b022",
+      "type": "narration",
+      "kind": "p",
+      "chapter": "dangers",
+      "text": "これらはすべて「自分が今何をしているのか分かっていない人」がプロダクションレベルのものを作ろうとしたときに起こる。",
+      "audio": "audio/b022.mp3",
+      "duration_sec": 7.419,
+      "voice_style": "[明るく]",
+      "prosody": {
+        "speed": 1.15,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b023",
+      "type": "narration",
+      "kind": "h3",
+      "chapter": "dangers",
+      "text": "ポジティブ事例は、たいてい低リスク",
+      "audio": "audio/b023.mp3",
+      "duration_sec": 3.03,
+      "voice_style": "[楽しく]",
+      "prosody": {
+        "speed": 1.1,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b024",
+      "type": "narration",
+      "kind": "p",
+      "chapter": "dangers",
+      "text": "逆に、バイブコーディングがうまく機能している例はどうかというと、ほぼすべてが「低リスクな領域」だ。自作のビデオゲーム、一晩で作るサイドプロジェクト、バグが出ても笑い話で済む遊びの類。",
+      "audio": "audio/b024.mp3",
+      "duration_sec": 12.539,
+      "voice_style": "[柔らかく]",
+      "prosody": {
+        "speed": 1.15,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b025",
+      "type": "narration",
+      "kind": "p",
+      "chapter": "dangers",
+      "text": "実プロダクトに使うとリスクが跳ね上がり、うまくいっているのはオモチャばかり——なら、バイブコーディングなんて気にしなくていいのでは？",
+      "audio": "audio/b025.mp3",
+      "duration_sec": 10.031,
+      "voice_style": "[問いかけるように]",
+      "prosody": {
+        "speed": 1.1,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b026",
+      "type": "narration",
+      "kind": "p",
+      "chapter": "dangers",
+      "text": "Eric 氏の答えは一言だ——「指数関数がある限り、気にするしかない」。次章で、この答えを真正面から解剖する。",
+      "audio": "audio/b026.mp3",
+      "duration_sec": 9.143,
+      "voice_style": "[明るく]",
+      "prosody": {
+        "speed": 1.15,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "p005",
+      "type": "piyo",
+      "kind": "piyo",
+      "chapter": "dangers",
+      "anchor": {
+        "mode": "after",
+        "ref": "b026"
+      },
+      "text": "「気にしなくていいのでは？」って思った矢先に「指数関数がある限り、気にするしかない」。これ、天気予報で「明日は晴れです、ただし来月には巨大台風が来ます」くらいの落差。次の章で、その台風の正体が出てくるよ。",
+      "audio": "audio/p005.mp3",
+      "duration_sec": 18.05,
+      "voice_style": "[親しげに]",
+      "prosody": {
+        "speed": 1.1,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b027",
+      "type": "narration",
+      "kind": "h2",
+      "chapter": "exponential",
+      "text": "指数関数の波 — 7 ヶ月で倍になる世界",
+      "audio": "audio/b027.mp3",
+      "duration_sec": 3.291,
+      "voice_style": "[明るく]",
+      "prosody": {
+        "speed": 1.05,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b028",
+      "type": "narration",
+      "kind": "p.lead",
+      "chapter": "exponential",
+      "text": "AI がこなせるタスクの長さ（一度の指示で完結できる作業量）は、約 7 ヶ月ごとに倍になっている。2025 年の現在地は「およそ 1 時間分の仕事」。",
+      "audio": "audio/b028.mp3",
+      "duration_sec": 11.86,
+      "voice_style": "[熱く]",
+      "prosody": {
+        "speed": 1.1,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b029",
+      "type": "narration",
+      "kind": "p",
+      "chapter": "exponential",
+      "text": "今はまだバイブコーディングを無理にしなくていい。Cursor に任せ、Claude Code に機能を書かせ、出てきたコードをレビューする——そのやり方で十分やっていける。人間が密にループに関われる規模だからだ。",
+      "audio": "audio/b029.mp3",
+      "duration_sec": 14.89,
+      "voice_style": "[優しく]",
+      "prosody": {
+        "speed": 1.1,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b030",
+      "type": "narration",
+      "kind": "h3",
+      "chapter": "exponential",
+      "text": "しかし、来年は？ 再来年は？",
+      "audio": "audio/b030.mp3",
+      "duration_sec": 3.788,
+      "voice_style": "[楽しく]",
+      "prosody": {
+        "speed": 1.1,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b031",
+      "type": "narration",
+      "kind": "p",
+      "chapter": "exponential",
+      "text": "1 時間が 2 時間になり、4 時間になり、1 日分の仕事、1 週間分の仕事をモデルが一息に吐き出すようになる。そのとき、コードを一行ずつ読むワークフローは物理的に追いつかない。",
+      "audio": "audio/b031.mp3",
+      "duration_sec": 12.617,
+      "voice_style": "[明るく]",
+      "prosody": {
+        "speed": 1.15,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b032",
+      "type": "narration",
+      "kind": "blockquote",
+      "chapter": "exponential",
+      "text": "指数関数の波に乗りたいなら、どこかで「責任を持って手放す」方法を見つけなければならない。",
+      "audio": "audio/b032.mp3",
+      "duration_sec": 9.169,
+      "voice_style": "[感動的に]",
+      "prosody": {
+        "speed": 0.95,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "p006",
+      "type": "piyo",
+      "kind": "piyo",
+      "chapter": "exponential",
+      "anchor": {
+        "mode": "after",
+        "ref": "b032"
+      },
+      "text": "「7 ヶ月で倍」——これ、ピンと来ないけど、たとえばお小遣いが半年ごとに倍になったら、数年後には人生が変わる額になる。指数関数って、「気づいたら別世界」が起きる形。油断してると、遅れる側になる。",
+      "audio": "audio/p006.mp3",
+      "duration_sec": 16.065,
+      "voice_style": "[親しげに]",
+      "prosody": {
+        "speed": 1.1,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b033",
+      "type": "narration",
+      "kind": "h3",
+      "chapter": "exponential",
+      "text": "コンパイラの喩え — 歴史は繰り返す",
+      "audio": "audio/b033.mp3",
+      "duration_sec": 2.717,
+      "voice_style": "[楽しく]",
+      "prosody": {
+        "speed": 1.1,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b034",
+      "type": "narration",
+      "kind": "p",
+      "chapter": "exponential",
+      "text": "Eric 氏が好む喩えがある。コンパイラ黎明期——当時のエンジニアの多くは、コンパイラを信用していなかった。生成されたアセンブリを目で読み、「自分が書くのと同じようになっているか」を毎回確認していた。",
+      "audio": "audio/b034.mp3",
+      "duration_sec": 14.576,
+      "voice_style": "[明るく]",
+      "prosody": {
+        "speed": 1.15,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b035",
+      "type": "narration",
+      "kind": "p",
+      "chapter": "exponential",
+      "text": "だが、システムが大きくなるにつれ、そのやり方は物理的に成立しなくなった。どこかで「信じる」しかなくなる。",
+      "audio": "audio/b035.mp3",
+      "duration_sec": 8.098,
+      "voice_style": "[明るく]",
+      "prosody": {
+        "speed": 1.15,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b036",
+      "type": "narration",
+      "kind": "div.pullquote",
+      "chapter": "exponential",
+      "text": "The code exists, but you no longer need to look at it. コードは存在する、ただし読まなくていい。",
+      "audio": "audio/b036.mp3",
+      "duration_sec": 7.549,
+      "voice_style": "[感動的に]",
+      "prosody": {
+        "speed": 0.95,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b037",
+      "type": "narration",
+      "kind": "p",
+      "chapter": "exponential",
+      "text": "僕らのソフトウェア業界全体への挑戦状は、ここにある——「プロダクトが存在することは忘れずに、コードが存在することを忘れる」。アセンブリは今もそこにある。だがほとんどの開発者は、もうアセンブリを読まずに良いソフトウェアを作れている。同じことを、もう一段上のレイヤーで起こす。",
+      "audio": "audio/b037.mp3",
+      "duration_sec": 20.82,
+      "voice_style": "[明るく]",
+      "prosody": {
+        "speed": 1.15,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "p007",
+      "type": "piyo",
+      "kind": "piyo",
+      "chapter": "exponential",
+      "anchor": {
+        "mode": "after",
+        "ref": "b037"
+      },
+      "text": "コードを書かずにソフトを作る、って聞くと、最初は「そんなの無理」って思う。でも昔のエンジニアは、「アセンブリを見ないでコードを書くなんて無理」って言ってたらしい。時代が変わると、「無理」の場所が一段上にずれる——それだけの話。",
+      "audio": "audio/p007.mp3",
+      "duration_sec": 17.502,
+      "voice_style": "[親しげに]",
+      "prosody": {
+        "speed": 1.1,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b038",
+      "type": "narration",
+      "kind": "h3",
+      "chapter": "exponential",
+      "text": "古くて新しい悩み — 実は古典的マネジメント問題",
+      "audio": "audio/b038.mp3",
+      "duration_sec": 3.944,
+      "voice_style": "[楽しく]",
+      "prosody": {
+        "speed": 1.1,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b039",
+      "type": "narration",
+      "kind": "p",
+      "chapter": "exponential",
+      "text": "ここで Eric 氏は、ソフトウェア業界の外に目を向ける。この問題は実は、文明史レベルで繰り返されてきた古い問題だというのだ。",
+      "audio": "audio/b039.mp3",
+      "duration_sec": 8.542,
+      "voice_style": "[明るく]",
+      "prosody": {
+        "speed": 1.15,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b040",
+      "type": "narration",
+      "kind": "li",
+      "chapter": "exponential",
+      "text": "CTOはその専門領域の一線の現場よりコードが書けるとは限らない。が、優秀な専門家の成果物を評価する方法を持っている。",
+      "audio": "audio/b040.mp3",
+      "duration_sec": 8.542,
+      "voice_style": "[テンポ良く]",
+      "prosody": {
+        "speed": 1.2,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b041",
+      "type": "narration",
+      "kind": "li",
+      "chapter": "exponential",
+      "text": "PMは、完成した機能のコードを読まない。だがプロダクトを使ってみて、意図通りに動くかを確かめられる。",
+      "audio": "audio/b041.mp3",
+      "duration_sec": 6.792,
+      "voice_style": "[テンポ良く]",
+      "prosody": {
+        "speed": 1.2,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b042",
+      "type": "narration",
+      "kind": "li",
+      "chapter": "exponential",
+      "text": "CEOは会計の専門家ではない。それでも分かるキーファクトとデータのスライスを抜き打ちチェックすることで、全体財務モデルの健全性に自信を持てる。",
+      "audio": "audio/b042.mp3",
+      "duration_sec": 9.587,
+      "voice_style": "[テンポ良く]",
+      "prosody": {
+        "speed": 1.2,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b043",
+      "type": "narration",
+      "kind": "p",
+      "chapter": "exponential",
+      "text": "つまり「自分が実装を理解していないものを、どう管理するか」は、世の中の全マネージャーが日常的に解いてきた問題である。ソフトウェアエンジニアだけが、これまで純粋な個人コントリビューターとしてスタック全段を自分で理解することに慣れすぎていたのだ。",
+      "audio": "audio/b043.mp3",
+      "duration_sec": 18.625,
+      "voice_style": "[丁寧に]",
+      "prosody": {
+        "speed": 1.1,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b044",
+      "type": "narration",
+      "kind": "p",
+      "chapter": "exponential",
+      "text": "実装を知らずとも検証可能な「抽象レイヤー」を見つけろ。これが、責任あるバイブコーディングの一行サマリである。",
+      "audio": "audio/b044.mp3",
+      "duration_sec": 7.706,
+      "voice_style": "[明るく]",
+      "prosody": {
+        "speed": 1.15,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "p008",
+      "type": "piyo",
+      "kind": "piyo",
+      "chapter": "exponential",
+      "anchor": {
+        "mode": "after",
+        "ref": "b044"
+      },
+      "text": "「実装を理解してないマネージャーが、どうやって成果を評価するか」——これ、工場でも、病院でも、役所でも、ずーっと昔から人類が解いてきた問題。エンジニアだけが、自分で全部見られるという特権に慣れすぎてた、って話なんだと思う。",
+      "audio": "audio/p008.mp3",
+      "duration_sec": 17.345,
+      "voice_style": "[親しげに]",
+      "prosody": {
+        "speed": 1.1,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b045",
+      "type": "narration",
+      "kind": "h2",
+      "chapter": "leaf-nodes",
+      "text": "葉ノード戦略 — 技術的負債を「押し込める」場所",
+      "audio": "audio/b045.mp3",
+      "duration_sec": 5.015,
+      "voice_style": "[明るく]",
+      "prosody": {
+        "speed": 1.05,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b046",
+      "type": "narration",
+      "kind": "p.lead",
+      "chapter": "leaf-nodes",
+      "text": "ただし、Eric 氏は一つだけ正直な but を付け加える。技術的負債（tech debt）だけは、今のところコードを読まずに検証する良い方法がない。",
+      "audio": "audio/b046.mp3",
+      "duration_sec": 11.05,
+      "voice_style": "[熱く]",
+      "prosody": {
+        "speed": 1.1,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b047",
+      "type": "narration",
+      "kind": "p",
+      "chapter": "leaf-nodes",
+      "text": "会計は監査で検証できる。プロダクトは使って検証できる。ところが技術的負債は、実装自体の専門家でないと見抜けない——これは現時点での厳然たる制約である。",
+      "audio": "audio/b047.mp3",
+      "duration_sec": 11.781,
+      "voice_style": "[明るく]",
+      "prosody": {
+        "speed": 1.15,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b048",
+      "type": "narration",
+      "kind": "h3",
+      "chapter": "leaf-nodes",
+      "text": "戦略：葉ノードに集中する",
+      "audio": "audio/b048.mp3",
+      "duration_sec": 2.9,
+      "voice_style": "[楽しく]",
+      "prosody": {
+        "speed": 1.1,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b049",
+      "type": "narration",
+      "kind": "p",
+      "chapter": "leaf-nodes",
+      "text": "この制約を認めた上で、それでもバイブコーディングを本番に取り入れる方法がある。答えは、コードベースの「葉ノード」に集中すること。",
+      "audio": "audio/b049.mp3",
+      "duration_sec": 8.542,
+      "voice_style": "[明るく]",
+      "prosody": {
+        "speed": 1.15,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b050",
+      "type": "narration",
+      "kind": "h3",
+      "chapter": "leaf-nodes",
+      "text": "なぜ葉ノードなら OK なのか",
+      "audio": "audio/b050.mp3",
+      "duration_sec": 2.978,
+      "voice_style": "[楽しく]",
+      "prosody": {
+        "speed": 1.1,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b051",
+      "type": "narration",
+      "kind": "li",
+      "chapter": "leaf-nodes",
+      "text": "何も依存していない——末端機能なので、負債が周囲に波及しない",
+      "audio": "audio/b051.mp3",
+      "duration_sec": 5.668,
+      "voice_style": "[テンポ良く]",
+      "prosody": {
+        "speed": 1.2,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b052",
+      "type": "narration",
+      "kind": "li",
+      "chapter": "leaf-nodes",
+      "text": "変更される可能性が低い——端の装飾、末端の機能は、書き換えが少ない",
+      "audio": "audio/b052.mp3",
+      "duration_sec": 6.949,
+      "voice_style": "[テンポ良く]",
+      "prosody": {
+        "speed": 1.2,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b053",
+      "type": "narration",
+      "kind": "li",
+      "chapter": "leaf-nodes",
+      "text": "上に何かが積み上がらない——別の機能の土台にはならない",
+      "audio": "audio/b053.mp3",
+      "duration_sec": 3.892,
+      "voice_style": "[テンポ良く]",
+      "prosody": {
+        "speed": 1.2,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "p009",
+      "type": "piyo",
+      "kind": "piyo",
+      "chapter": "leaf-nodes",
+      "anchor": {
+        "mode": "after",
+        "ref": "b053"
+      },
+      "text": "家のリフォームでいうと、「家具の買い替え」と「柱の付け替え」って、別物だよね。前者は多少失敗しても住めるけど、後者は家が傾く。Claude に任せるのは、まず前者の方から。柱は、しばらく自分で触る。",
+      "audio": "audio/p009.mp3",
+      "duration_sec": 16.3,
+      "voice_style": "[共感的に]",
+      "prosody": {
+        "speed": 1.05,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b054",
+      "type": "narration",
+      "kind": "p",
+      "chapter": "leaf-nodes",
+      "text": "逆に幹や太い枝——中核アーキテクチャ、共有インフラ、横断ユーティリティ——は、人間が今後も深く理解し続ける必要がある。そこにこそ他の機能が積み上がり、そこが拡張可能で読みやすく柔軟であることが、組織全体の速度を決める。",
+      "audio": "audio/b054.mp3",
+      "duration_sec": 14.968,
+      "voice_style": "[明るく]",
+      "prosody": {
+        "speed": 1.15,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b055",
+      "type": "narration",
+      "kind": "p",
+      "chapter": "leaf-nodes",
+      "text": "モデルは毎月賢くなっている。Eric 氏は「この 1〜2 週間 Claude 4 を使って、3.7 の頃よりずっと信頼できるようになった」と語る。「葉ノードにしか使えない」という境界は、年々内側（幹側）へ侵食していく。",
+      "audio": "audio/b055.mp3",
+      "duration_sec": 17.502,
+      "voice_style": "[明るく]",
+      "prosody": {
+        "speed": 1.15,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b056",
+      "type": "narration",
+      "kind": "h2",
+      "chapter": "be-pm",
+      "text": "Claude の PM になる — 成功の核",
+      "audio": "audio/b056.mp3",
+      "duration_sec": 3.344,
+      "voice_style": "[明るく]",
+      "prosody": {
+        "speed": 1.05,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b057",
+      "type": "narration",
+      "kind": "p.lead",
+      "chapter": "be-pm",
+      "text": "バイブコーディングで成功するための、Eric 氏のたった一つのアドバイス——",
+      "audio": "audio/b057.mp3",
+      "duration_sec": 5.303,
+      "voice_style": "[熱く]",
+      "prosody": {
+        "speed": 1.1,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b058",
+      "type": "narration",
+      "kind": "div.pullquote",
+      "chapter": "be-pm",
+      "text": "Ask not what Claude can do for you, but what you can do for Claude.",
+      "audio": "audio/b058.mp3",
+      "duration_sec": 5.747,
+      "voice_style": "[感動的に]",
+      "prosody": {
+        "speed": 0.95,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b059",
+      "type": "narration",
+      "kind": "p",
+      "chapter": "be-pm",
+      "text": "バイブコーディング中、あなたの役割は「Claude のプロダクトマネージャー」である。PM のように考えよ：このタスクで成功するために、新入社員ならどんなガイダンスとコンテキストが要るか？",
+      "audio": "audio/b059.mp3",
+      "duration_sec": 14.707,
+      "voice_style": "[問いかけるように]",
+      "prosody": {
+        "speed": 1.1,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "p010",
+      "type": "piyo",
+      "kind": "piyo",
+      "chapter": "be-pm",
+      "anchor": {
+        "mode": "after",
+        "ref": "b059"
+      },
+      "text": "「Claude の PM になる」って、ひと言で言うと、「お願いの仕方を、プロっぽくする」ってこと。「いい感じでよろしく」だと、人間の新人も困る。Claude も、たぶん同じ。ちゃんと目的・背景・制約を話す、それだけで、仕上がりが全然違う。",
+      "audio": "audio/p010.mp3",
+      "duration_sec": 17.789,
+      "voice_style": "[親しげに]",
+      "prosody": {
+        "speed": 1.1,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b060",
+      "type": "narration",
+      "kind": "h3",
+      "chapter": "be-pm",
+      "text": "コンテキストの集め方 — 15〜20 分を投資する",
+      "audio": "audio/b060.mp3",
+      "duration_sec": 3.735,
+      "voice_style": "[楽しく]",
+      "prosody": {
+        "speed": 1.1,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b061",
+      "type": "narration",
+      "kind": "p",
+      "chapter": "be-pm",
+      "text": "多くの人は、AI に対して短いキャッチボール型のやり取りをしがちだ：「この機能作って」「このバグ直して」。しかし、もし出社初日の新入社員に「この機能を今すぐ実装して」とだけ言ったら？——成功できる見込みは、ほぼゼロだ。",
+      "audio": "audio/b061.mp3",
+      "duration_sec": 17.058,
+      "voice_style": "[問いかけるように]",
+      "prosody": {
+        "speed": 1.1,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b062",
+      "type": "narration",
+      "kind": "p",
+      "chapter": "be-pm",
+      "text": "Eric 氏は、機能を Claude に任せるとき最初の 15〜20 分をコンテキスト集めに使うという。しかも、その時間は「人間が一人でプロンプトを書いている時間」ではない：",
+      "audio": "audio/b062.mp3",
+      "duration_sec": 11.494,
+      "voice_style": "[明るく]",
+      "prosody": {
+        "speed": 1.15,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b063",
+      "type": "narration",
+      "kind": "li",
+      "chapter": "be-pm",
+      "text": "別セッションで Claude と会話する。コードベースを探検させ、関連ファイルを探させる",
+      "audio": "audio/b063.mp3",
+      "duration_sec": 5.956,
+      "voice_style": "[テンポ良く]",
+      "prosody": {
+        "speed": 1.2,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b064",
+      "type": "narration",
+      "kind": "li",
+      "chapter": "be-pm",
+      "text": "一緒に計画を練る——何をしたいか、どのファイルを触るか、既存のどのパターンに従うべきか",
+      "audio": "audio/b064.mp3",
+      "duration_sec": 6.792,
+      "voice_style": "[テンポ良く]",
+      "prosody": {
+        "speed": 1.2,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b065",
+      "type": "narration",
+      "kind": "li",
+      "chapter": "be-pm",
+      "text": "その対話の結晶として、一つのプロンプト（または計画書）を作る",
+      "audio": "audio/b065.mp3",
+      "duration_sec": 4.937,
+      "voice_style": "[テンポ良く]",
+      "prosody": {
+        "speed": 1.2,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b066",
+      "type": "narration",
+      "kind": "li",
+      "chapter": "be-pm",
+      "text": "それを携え、別の新しいコンテキストに移って、「この計画を実行して」と指示",
+      "audio": "audio/b066.mp3",
+      "duration_sec": 5.721,
+      "voice_style": "[テンポ良く]",
+      "prosody": {
+        "speed": 1.2,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b067",
+      "type": "narration",
+      "kind": "p",
+      "chapter": "be-pm",
+      "text": "この手間を前払いすると、Claude の成功率は劇的に跳ね上がる。逆にここを省略すると、後段で何度も手戻りする。",
+      "audio": "audio/b067.mp3",
+      "duration_sec": 9.796,
+      "voice_style": "[明るく]",
+      "prosody": {
+        "speed": 1.15,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "p011",
+      "type": "piyo",
+      "kind": "piyo",
+      "chapter": "be-pm",
+      "anchor": {
+        "mode": "after",
+        "ref": "b067"
+      },
+      "text": "「最初の 15 分を準備に使う」って、急がば回れの典型。料理でいうと、下ごしらえの時間を惜しんだフライパンは、たいてい失敗する。いきなり火にかけない——これ、Claude 相手でも有効。",
+      "audio": "audio/p011.mp3",
+      "duration_sec": 16.039,
+      "voice_style": "[親しげに]",
+      "prosody": {
+        "speed": 1.1,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b068",
+      "type": "narration",
+      "kind": "h3",
+      "chapter": "be-pm",
+      "text": "正しい問いを立てる — 全員がバイブコードすべきとは限らない",
+      "audio": "audio/b068.mp3",
+      "duration_sec": 4.258,
+      "voice_style": "[楽しく]",
+      "prosody": {
+        "speed": 1.1,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b069",
+      "type": "narration",
+      "kind": "p",
+      "chapter": "be-pm",
+      "text": "ここで Eric 氏は、トークのタイトルに反する正直な告白をする。",
+      "audio": "audio/b069.mp3",
+      "duration_sec": 4.989,
+      "voice_style": "[明るく]",
+      "prosody": {
+        "speed": 1.15,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b070",
+      "type": "narration",
+      "kind": "blockquote",
+      "chapter": "be-pm",
+      "text": "I don't think that vibe coding in prod is for everybody. 本番でのバイブコーディングは、全員に向いているわけではない。",
+      "audio": "audio/b070.mp3",
+      "duration_sec": 10.475,
+      "voice_style": "[感動的に]",
+      "prosody": {
+        "speed": 0.95,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b071",
+      "type": "narration",
+      "kind": "p",
+      "chapter": "be-pm",
+      "text": "完全に非技術的な人がゼロからビジネスを構築するのは危険だ、と彼は言う。なぜか——正しい問いを立てられないからだ。PM が仕様を詰められないのと同じで、Claude の PM が Claude に効果的な指示を出せない。",
+      "audio": "audio/b071.mp3",
+      "duration_sec": 15.935,
+      "voice_style": "[真剣に]",
+      "prosody": {
+        "speed": 1.05,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b072",
+      "type": "narration",
+      "kind": "p",
+      "chapter": "be-pm",
+      "text": "ゲームや創作、個人の道具作りにおけるバイブコーディングは素晴らしい。しかし本番のプロダクションシステムには、「正しい問いを立てられる」だけの技術的理解が必要。ここは区別すべき、と Eric 氏は明確に線を引く。",
+      "audio": "audio/b072.mp3",
+      "duration_sec": 16.196,
+      "voice_style": "[明るく]",
+      "prosody": {
+        "speed": 1.15,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b073",
+      "type": "narration",
+      "kind": "h2",
+      "chapter": "case-study",
+      "text": "2 万 2 千行の PR — Anthropic 社内の実例",
+      "audio": "audio/b073.mp3",
+      "duration_sec": 4.415,
+      "voice_style": "[明るく]",
+      "prosody": {
+        "speed": 1.05,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b074",
+      "type": "narration",
+      "kind": "p",
+      "chapter": "case-study",
+      "text": "抽象論はここまで。Eric 氏は、Anthropic 社内で最近起きた生々しい実例を紹介する。",
+      "audio": "audio/b074.mp3",
+      "duration_sec": 6.243,
+      "voice_style": "[明るく]",
+      "prosody": {
+        "speed": 1.15,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b075",
+      "type": "narration",
+      "kind": "p",
+      "chapter": "case-study",
+      "text": "Anthropic の本番強化学習（RL）コードベースに、22,000 行にわたる変更を含む PR がマージされた。このコードの大部分は、Claude が書いた。",
+      "audio": "audio/b075.mp3",
+      "duration_sec": 10.762,
+      "voice_style": "[明るく]",
+      "prosody": {
+        "speed": 1.15,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b076",
+      "type": "narration",
+      "kind": "p",
+      "chapter": "case-study",
+      "text": "ではどうやって、この規模を責任を持ってねじ込めたのか。Eric 氏は 4 つの要素を挙げる：",
+      "audio": "audio/b076.mp3",
+      "duration_sec": 6.739,
+      "voice_style": "[明るく]",
+      "prosody": {
+        "speed": 1.15,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b077",
+      "type": "narration",
+      "kind": "div.feat-card",
+      "chapter": "case-study",
+      "text": "Claude の PM に徹した 単発プロンプトでマージしたのではない。要件定義、Claude への誘導、システム設計——数日分の人間の仕事が前段にあった。PM ロールを全員が自覚的に引き受けた。",
+      "audio": "audio/b077.mp3",
+      "duration_sec": 13.871,
+      "voice_style": "[明るく]",
+      "prosody": {
+        "speed": 1.15,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b078",
+      "type": "narration",
+      "kind": "div.feat-card",
+      "chapter": "case-study",
+      "text": "変更を葉ノードに集中 近い将来、変更が入らないと分かっている末端機能に意図的に集中。「多少の負債があってもこの場所なら許容できる」ラインを引いた。",
+      "audio": "audio/b078.mp3",
+      "duration_sec": 11.024,
+      "voice_style": "[明るく]",
+      "prosody": {
+        "speed": 1.15,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b079",
+      "type": "narration",
+      "kind": "div.feat-card",
+      "chapter": "case-study",
+      "text": "幹部分は人間レビュー 拡張性が重要になる部分だけ、徹底的に人間が読んだ。メリハリのついたレビュー配分。",
+      "audio": "audio/b079.mp3",
+      "duration_sec": 8.803,
+      "voice_style": "[明るく]",
+      "prosody": {
+        "speed": 1.15,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b080",
+      "type": "narration",
+      "kind": "div.feat-card",
+      "chapter": "case-study",
+      "text": "検証可能な設計 入力・出力を人間が確認しやすい形に意図的に設計。ストレステストを長時間走らせて安定性を実測。「読まなくても確かめられる」チェックポイントを仕込んだ。",
+      "audio": "audio/b080.mp3",
+      "duration_sec": 12.591,
+      "voice_style": "[明るく]",
+      "prosody": {
+        "speed": 1.15,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b081",
+      "type": "narration",
+      "kind": "h3",
+      "chapter": "case-study",
+      "text": "結果 — 自信は「手書きレビュー」と同等",
+      "audio": "audio/b081.mp3",
+      "duration_sec": 3.448,
+      "voice_style": "[楽しく]",
+      "prosody": {
+        "speed": 1.1,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b082",
+      "type": "narration",
+      "kind": "p",
+      "chapter": "case-study",
+      "text": "結論として、この PR に対する信頼感は、普段の変更と同等まで持ち上がった。しかも所要時間は手で書いてすべてをレビューする場合のほんの一部。",
+      "audio": "audio/b082.mp3",
+      "duration_sec": 10.606,
+      "voice_style": "[明るく]",
+      "prosody": {
+        "speed": 1.15,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b083",
+      "type": "narration",
+      "kind": "p.lead",
+      "chapter": "case-study",
+      "text": "そしてもう一つ、Eric 氏が興奮を隠さず語ったのは——",
+      "audio": "audio/b083.mp3",
+      "duration_sec": 4.258,
+      "voice_style": "[熱く]",
+      "prosody": {
+        "speed": 1.1,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b084",
+      "type": "narration",
+      "kind": "blockquote",
+      "chapter": "case-study",
+      "text": "これが一番ワクワクしたのは、1 週間を節約したこと自体より、 「これができる」と知ったあとに、考え方そのものが変わったことだ。",
+      "audio": "audio/b084.mp3",
+      "duration_sec": 11.468,
+      "voice_style": "[感動的に]",
+      "prosody": {
+        "speed": 0.95,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b085",
+      "type": "narration",
+      "kind": "p",
+      "chapter": "case-study",
+      "text": "以前は「2 週間かかるから今回は見送ろう」としていた機能が、1 日でできるなら、やっちゃおうになる。ソフトウェアの限界費用が下がり、消費と創造の容量が一段上がる——そこが本当の恩恵だと彼は言う。",
+      "audio": "audio/b085.mp3",
+      "duration_sec": 13.766,
+      "voice_style": "[明るく]",
+      "prosody": {
+        "speed": 1.15,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "p012",
+      "type": "piyo",
+      "kind": "piyo",
+      "chapter": "case-study",
+      "anchor": {
+        "mode": "after",
+        "ref": "b085"
+      },
+      "text": "「1 週間かかると思ってた仕事が、1 日で終わる」——これ、金額にも、気持ちにも、じわじわ効いてくる。「難しすぎるから今年は見送ろう」が「じゃ、今週やってみるか」に変わる。できることの範囲そのものが、広がっていく。",
+      "audio": "audio/p012.mp3",
+      "duration_sec": 17.058,
+      "voice_style": "[親しげに]",
+      "prosody": {
+        "speed": 1.1,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b086",
+      "type": "narration",
+      "kind": "h2",
+      "chapter": "closing",
+      "text": "持ち帰るべきこと — 4 つのクロージング",
+      "audio": "audio/b086.mp3",
+      "duration_sec": 2.717,
+      "voice_style": "[明るく]",
+      "prosody": {
+        "speed": 1.05,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b087",
+      "type": "narration",
+      "kind": "p.lead",
+      "chapter": "closing",
+      "text": "Eric 氏は、トークの最後に、明日から使える 4 つの原則に凝縮する。",
+      "audio": "audio/b087.mp3",
+      "duration_sec": 5.982,
+      "voice_style": "[熱く]",
+      "prosody": {
+        "speed": 1.1,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b088",
+      "type": "narration",
+      "kind": "li",
+      "chapter": "closing",
+      "text": "Be Claude's PM. Claude の PM になりきること。コンテキスト、要件、制約を、新入社員に説明するつもりで用意する。",
+      "audio": "audio/b088.mp3",
+      "duration_sec": 9.665,
+      "voice_style": "[テンポ良く]",
+      "prosody": {
+        "speed": 1.2,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b089",
+      "type": "narration",
+      "kind": "li",
+      "chapter": "closing",
+      "text": "Focus on leaf nodes. バイブコーディングは葉ノードに。中核アーキテクチャと基盤システムは人間の領域として守る。",
+      "audio": "audio/b089.mp3",
+      "duration_sec": 7.915,
+      "voice_style": "[テンポ良く]",
+      "prosody": {
+        "speed": 1.2,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b090",
+      "type": "narration",
+      "kind": "li",
+      "chapter": "closing",
+      "text": "Think about verifiability. 「コードを読まずに正しさをどう確かめるか？」——これを設計段階から問い続ける。入出力を検証可能に、チェックポイントを仕込む。",
+      "audio": "audio/b090.mp3",
+      "duration_sec": 10.37,
+      "voice_style": "[問いかけるように]",
+      "prosody": {
+        "speed": 1.1,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b091",
+      "type": "narration",
+      "kind": "li",
+      "chapter": "closing",
+      "text": "Remember the exponential. 今日はまだバイブコーディングをしなくていい。1〜2 年後には、それが大きなディスアドバンテージになる。モデルが 1 週間分の仕事を出力する世界で、「全行読む／全行書く」を掲げる人は、ボトルネックになる。",
+      "audio": "audio/b091.mp3",
+      "duration_sec": 16.875,
+      "voice_style": "[優しく]",
+      "prosody": {
+        "speed": 1.1,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "p013",
+      "type": "piyo",
+      "kind": "piyo",
+      "chapter": "closing",
+      "anchor": {
+        "mode": "after",
+        "ref": "b091"
+      },
+      "text": "四つの原則、ぜんぶ覚えなくていい。Claude の PM になる、葉っぱに任せる、検証を先に設計する、指数関数を忘れない。この四つを、小さい仕事でいいから、一つずつ触ってみてほしいな。",
+      "audio": "audio/p013.mp3",
+      "duration_sec": 15.177,
+      "voice_style": "[親しげに]",
+      "prosody": {
+        "speed": 1.1,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b092",
+      "type": "narration",
+      "kind": "p",
+      "chapter": "closing",
+      "text": "これは、今後数年のソフトウェア産業にとって最大のチャレンジの一つになる。——だからこそ、今のうちに手触りを獲得しておこう。",
+      "audio": "audio/b092.mp3",
+      "duration_sec": 8.359,
+      "voice_style": "[明るく]",
+      "prosody": {
+        "speed": 1.15,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b093",
+      "type": "narration",
+      "kind": "h2",
+      "chapter": "qa",
+      "text": "Q&A — 会場からの質問",
+      "audio": "audio/b093.mp3",
+      "duration_sec": 2.064,
+      "voice_style": "[明るく]",
+      "prosody": {
+        "speed": 1.05,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b094",
+      "type": "narration",
+      "kind": "summary",
+      "chapter": "qa",
+      "text": "かつては構文エラーやライブラリ連携で「苦労して」学んだ。今後、良いバイブコーダー／良い PM になるには？",
+      "audio": "audio/b094.mp3",
+      "duration_sec": 8.176,
+      "voice_style": "[問いかけるように]",
+      "prosody": {
+        "speed": 1.1,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b095",
+      "type": "narration",
+      "kind": "p",
+      "chapter": "qa",
+      "text": "心配な面と楽観的な面、両方あります。心配な面は、「苦労の中でしか学べないもの」に手が届きにくくなること。とはいえ、大学時代の教授が「今の若い奴らはアセンブリを手で書いたことがないから本当には速いコードが書けない」と嘆いていたのと、同じ種類の変化でもあります。",
+      "audio": "audio/b095.mp3",
+      "duration_sec": 22.962,
+      "voice_style": "[確信を持って]",
+      "prosody": {
+        "speed": 1.05,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b096",
+      "type": "narration",
+      "kind": "p",
+      "chapter": "qa",
+      "text": "楽観的な面は、僕自身、AI ツールを使うと圧倒的に速く新しいことを学べること。Claude と一緒にコーディングしている時、「このライブラリ見たことない、教えて。なぜこれを選んだの？他と比べてどう違う？」と聞けば、常駐のペアプログラマーとして答えが返ってくる。",
+      "audio": "audio/b096.mp3",
+      "duration_sec": 18.129,
+      "voice_style": "[問いかけるように]",
+      "prosody": {
+        "speed": 1.1,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b097",
+      "type": "narration",
+      "kind": "p",
+      "chapter": "qa",
+      "text": "怠け者は学ばなくなる。でも学びたい人にとっては、これほど豊かな時代はない。Claude は、自分がバイブコードで作ったものの中身を一緒に読み解いてくれる。",
+      "audio": "audio/b097.mp3",
+      "duration_sec": 10.815,
+      "voice_style": "[明るく]",
+      "prosody": {
+        "speed": 1.15,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b098",
+      "type": "narration",
+      "kind": "p",
+      "chapter": "qa",
+      "text": "もう一つの面——「良いアーキテクチャだったか」が分かるサイクルが、今まで 2 年かかっていたものが 6 ヶ月に縮む可能性がある。本気で学ぼうとするエンジニアは、同じ暦期間で4 倍の数のレッスンを吸収できる。",
+      "audio": "audio/b098.mp3",
+      "duration_sec": 14.89,
+      "voice_style": "[明るく]",
+      "prosody": {
+        "speed": 1.15,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "p014",
+      "type": "piyo",
+      "kind": "piyo",
+      "chapter": "qa",
+      "anchor": {
+        "mode": "after",
+        "ref": "b098"
+      },
+      "text": "「怠け者は学ばない、でも学びたい人は四倍速で学べる」。これ、けっこう刺さる。道具が便利になるほど、姿勢の差が広がる時代になるんだよね。たぶん、これからの数年、この差はどんどん開いていく。",
+      "audio": "audio/p014.mp3",
+      "duration_sec": 16.953,
+      "voice_style": "[共感的に]",
+      "prosody": {
+        "speed": 1.05,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b099",
+      "type": "narration",
+      "kind": "summary",
+      "chapter": "qa",
+      "text": "プリプラニングで「情報を与えすぎ」と「足りない」のバランスは？ PRD のような定型テンプレを使っている？",
+      "audio": "audio/b099.mp3",
+      "duration_sec": 7.889,
+      "voice_style": "[問いかけるように]",
+      "prosody": {
+        "speed": 1.1,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b100",
+      "type": "narration",
+      "kind": "p",
+      "chapter": "qa",
+      "text": "何を大事にしているかで変わります。実装の詳細にこだわらないタスクなら、「要件はこれ、最終状態はこれ」だけ書いて、実装方針には触れない。一方、コードベースを熟知している領域では、「このクラスを使って、この類似機能を参考に」とかなり踏み込む。",
+      "audio": "audio/b100.mp3",
+      "duration_sec": 20.82,
+      "voice_style": "[明るく]",
+      "prosody": {
+        "speed": 1.15,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b101",
+      "type": "narration",
+      "kind": "p",
+      "chapter": "qa",
+      "text": "全体としては——過剰に制約しない方が、モデルは良い仕事をする。厳格なテンプレ運用にそれほどこだわる必要はない。新入社員に渡すつもりで——それくらいの温度感で十分です。",
+      "audio": "audio/b101.mp3",
+      "duration_sec": 13.401,
+      "voice_style": "[明るく]",
+      "prosody": {
+        "speed": 1.15,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b102",
+      "type": "narration",
+      "kind": "summary",
+      "chapter": "qa",
+      "text": "セキュリティとの両立は？ 先日、有名バイブコードアプリ 10 個がハッキングされた事件もあった。",
+      "audio": "audio/b102.mp3",
+      "duration_sec": 6.557,
+      "voice_style": "[問いかけるように]",
+      "prosody": {
+        "speed": 1.1,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b103",
+      "type": "narration",
+      "kind": "p",
+      "chapter": "qa",
+      "text": "これはまさに「Claude の PM」の話に戻ります。PM として「どこが危険か、どこが安全か、どこを注意深く扱うべきか」を十分に理解していること。",
+      "audio": "audio/b103.mp3",
+      "duration_sec": 13.636,
+      "voice_style": "[真剣に]",
+      "prosody": {
+        "speed": 1.05,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b104",
+      "type": "narration",
+      "kind": "p",
+      "chapter": "qa",
+      "text": "メディアで騒がれているバイブコーディング事故の多くは、本来、本番システムを書くべきではない人が書いてしまったケース。言い方が悪かったので言い直すと——重要な本番システムをバイブコードすべきではない層がやってしまっているケース、です。",
+      "audio": "audio/b104.mp3",
+      "duration_sec": 15.83,
+      "voice_style": "[明るく]",
+      "prosody": {
+        "speed": 1.15,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b105",
+      "type": "narration",
+      "kind": "p",
+      "chapter": "qa",
+      "text": "Anthropic の先の 2 万 2 千行の例は、完全にオフライン環境で動くシステムだった。だからこそセキュリティ面で「絶対に事故は起こり得ない」という高い確信を持てた。バイブコーディングの適用範囲は、状況と文脈で判断するのが王道です。",
+      "audio": "audio/b105.mp3",
+      "duration_sec": 19.148,
+      "voice_style": "[感動的に]",
+      "prosody": {
+        "speed": 1.0,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b106",
+      "type": "narration",
+      "kind": "summary",
+      "chapter": "qa",
+      "text": "世界人口の 0.5% 未満がソフトウェア開発者。ノンエンジニアがもっと安全にバイブコードで構築できるようになるには、プロダクトはどう変わるべき？",
+      "audio": "audio/b106.mp3",
+      "duration_sec": 10.658,
+      "voice_style": "[問いかけるように]",
+      "prosody": {
+        "speed": 1.1,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b107",
+      "type": "narration",
+      "kind": "p",
+      "chapter": "qa",
+      "text": "「証明可能に正しい」フレームワークやプロダクトがたくさん生まれてほしい。例えば——バックエンドで危ない部分（決済、認証）は既製で組み込み済み、ユーザーはUI レイヤーだけを埋めるような、空欄穴埋め型のサンドボックス。",
+      "audio": "audio/b107.mp3",
+      "duration_sec": 16.17,
+      "voice_style": "[丁寧に]",
+      "prosody": {
+        "speed": 1.1,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b108",
+      "type": "narration",
+      "kind": "p",
+      "chapter": "qa",
+      "text": "最もシンプルな先行例は Claude Artifacts。認証も決済もない、フロントエンドのみの環境だから、どれだけ乱暴にコードを生成しても安全。この発想をバックエンド付きで、どんな乱戦が起きても壊れないホスティング環境として実装したプロダクトがあれば、それは面白いビジネスになる。",
+      "audio": "audio/b108.mp3",
+      "duration_sec": 19.513,
+      "voice_style": "[柔らかく]",
+      "prosody": {
+        "speed": 1.15,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b109",
+      "type": "narration",
+      "kind": "p",
+      "chapter": "qa",
+      "text": "バイブコーディングと補完関係にあるツールを誰か作ってください——僕たちもそれに期待しています。",
+      "audio": "audio/b109.mp3",
+      "duration_sec": 5.433,
+      "voice_style": "[明るく]",
+      "prosody": {
+        "speed": 1.15,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b110",
+      "type": "narration",
+      "kind": "summary",
+      "chapter": "qa",
+      "text": "テスト駆動開発のコツは？ 実装を先に書かせるとテストが後付けになりがち。",
+      "audio": "audio/b110.mp3",
+      "duration_sec": 6.06,
+      "voice_style": "[問いかけるように]",
+      "prosody": {
+        "speed": 1.1,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b111",
+      "type": "narration",
+      "kind": "p",
+      "chapter": "qa",
+      "text": "TDD はバイブコーディングでとても有効です。テストケースが理解できる範囲なら、それ自体が検証の抽象レイヤーになるから。",
+      "audio": "audio/b111.mp3",
+      "duration_sec": 6.922,
+      "voice_style": "[明るく]",
+      "prosody": {
+        "speed": 1.15,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b112",
+      "type": "narration",
+      "kind": "p",
+      "chapter": "qa",
+      "text": "Claude は放っておくと「実装に密着しすぎたテスト」に寄りがち。僕はかなり明示的に「エンドトゥエンドのテストを 3 つ書いて。ハッピーパス、エラーケース A、エラーケース B。全体で 3 つだけ」と指定します。このくらい規範的な方が、テストが「自分が読んで分かる抽象レイヤー」に留まってくれる。",
+      "audio": "audio/b112.mp3",
+      "duration_sec": 22.413,
+      "voice_style": "[明るく]",
+      "prosody": {
+        "speed": 1.15,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b113",
+      "type": "narration",
+      "kind": "p",
+      "chapter": "qa",
+      "text": "バイブコーディング時、コード本体より先にテストだけは必ず読む——テストに合意できて、それが通っているなら、実装への信頼度は一気に上がる。",
+      "audio": "audio/b113.mp3",
+      "duration_sec": 10.057,
+      "voice_style": "[わくわく]",
+      "prosody": {
+        "speed": 1.2,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "p015",
+      "type": "piyo",
+      "kind": "piyo",
+      "chapter": "qa",
+      "anchor": {
+        "mode": "after",
+        "ref": "b113"
+      },
+      "text": "「テストだけは先に読む」。これ、テスト駆動開発の精神を、バイブコーディング時代に翻訳したやつ。実装を信じるんじゃなく、検証の入口を自分で理解しておく——これだけで、任せる勇気が出る。",
+      "audio": "audio/p015.mp3",
+      "duration_sec": 14.811,
+      "voice_style": "[親しげに]",
+      "prosody": {
+        "speed": 1.1,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b114",
+      "type": "narration",
+      "kind": "summary",
+      "chapter": "qa",
+      "text": "「指数関数を受け入れろ」とは具体的にどういうこと？ モデルは改善するとはいえ、全軸で同じように伸びるわけでは？",
+      "audio": "audio/b114.mp3",
+      "duration_sec": 7.706,
+      "voice_style": "[問いかけるように]",
+      "prosody": {
+        "speed": 1.1,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b115",
+      "type": "narration",
+      "kind": "p",
+      "chapter": "qa",
+      "text": "鋭い質問です。指数関数の本質は「毎年良くなる」という話ではなく——想像できる速度より速く良くなるという話なんです。ある点を超えると、ただ線形に増えているようには見えなくなる。ワイルドな領域に一気に行く。",
+      "audio": "audio/b115.mp3",
+      "duration_sec": 15.726,
+      "voice_style": "[わくわく]",
+      "prosody": {
+        "speed": 1.2,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b116",
+      "type": "narration",
+      "kind": "p",
+      "chapter": "qa",
+      "text": "Dario（CEO）と Mike Krieger（CPO）のトークに印象的な言葉がある——「Machines of Loving Grace はサイエンスフィクションではない。プロダクトロードマップだ」。遠い未来の話に聞こえるけど、指数曲線に乗っていると、想像の外側へ高速で進む。",
+      "audio": "audio/b116.mp3",
+      "duration_sec": 17.998,
+      "voice_style": "[明るく]",
+      "prosody": {
+        "speed": 1.15,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b117",
+      "type": "narration",
+      "kind": "p",
+      "chapter": "qa",
+      "text": "90 年代のコンピュータに関わっていた人に「RAM が数 KB しかない」と言われ、「はい、今は数 KB、来年は数 KB 増えます」と答えたとしたら——現在のテラバイトという答えは出てこない。2 倍どころか、百万倍になった。",
+      "audio": "audio/b117.mp3",
+      "duration_sec": 15.308,
+      "voice_style": "[明るく]",
+      "prosody": {
+        "speed": 1.15,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b118",
+      "type": "narration",
+      "kind": "p",
+      "chapter": "qa",
+      "text": "「指数関数を受け入れる」とは、20 年後のモデルは今より 2 倍賢いという予想ではなく、今より百万倍賢く、百万倍速い世界を前提に考え始めることです。それは正直、どういう世界なのか、僕らにはまだちゃんと想像できません。",
+      "audio": "audio/b118.mp3",
+      "duration_sec": 15.726,
+      "voice_style": "[優しく]",
+      "prosody": {
+        "speed": 1.1,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "p016",
+      "type": "piyo",
+      "kind": "piyo",
+      "chapter": "qa",
+      "anchor": {
+        "mode": "after",
+        "ref": "b118"
+      },
+      "text": "「今より百万倍速い世界」——想像がつかないけど、それを本気で想像しようとする姿勢は、とても大事。想像できないからといって、考えなくていい、にはならない。未来の設計って、たぶんこういう言葉から始まる。",
+      "audio": "audio/p016.mp3",
+      "duration_sec": 16.248,
+      "voice_style": "[優しく真剣に]",
+      "prosody": {
+        "speed": 1.05,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b119",
+      "type": "narration",
+      "kind": "summary",
+      "chapter": "qa",
+      "text": "ターミナルの Claude Code 派と VS Code/Cursor 派、どちらを使う？ Claude Code の /compact はどれくらいの頻度で？",
+      "audio": "audio/b119.mp3",
+      "duration_sec": 7.706,
+      "voice_style": "[問いかけるように]",
+      "prosody": {
+        "speed": 1.1,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b120",
+      "type": "narration",
+      "kind": "p",
+      "chapter": "qa",
+      "text": "両方使います。VS Code の隣でターミナル Claude Code を開き、Claude Code に編集させつつ、VS Code 側で進行を眺める——この形が多い。純粋なバイブコーディングというより、テストだけ読むくらいのハイブリッドです。",
+      "audio": "audio/b120.mp3",
+      "duration_sec": 15.752,
+      "voice_style": "[明るく]",
+      "prosody": {
+        "speed": 1.15,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b121",
+      "type": "narration",
+      "kind": "p",
+      "chapter": "qa",
+      "text": "/compact は、人間の開発者なら「ここで昼休憩入れたいな」と思う区切りで使います。たとえば「関連ファイルを全部探させてプランを作らせた」あと、そのプランをドキュメントに書き出させてから compact する。これで、計画立案に使った 100K トークンが、数千トークンの抽出結果に圧縮される。",
+      "audio": "audio/b121.mp3",
+      "duration_sec": 20.01,
+      "voice_style": "[丁寧に]",
+      "prosody": {
+        "speed": 1.1,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b122",
+      "type": "narration",
+      "kind": "p",
+      "chapter": "qa",
+      "text": "セッションを清潔に保つコツは、「良いストッピングポイントで区切る」ことです。",
+      "audio": "audio/b122.mp3",
+      "duration_sec": 4.519,
+      "voice_style": "[明るく]",
+      "prosody": {
+        "speed": 1.15,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b123",
+      "type": "narration",
+      "kind": "summary",
+      "chapter": "qa",
+      "text": "複数の Claude Code を走らせたり、Git ワークツリーを使う運用は？ 不慣れなコードベースで素早く PR を出すコツは？",
+      "audio": "audio/b123.mp3",
+      "duration_sec": 8.437,
+      "voice_style": "[問いかけるように]",
+      "prosody": {
+        "speed": 1.1,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b124",
+      "type": "narration",
+      "kind": "p",
+      "chapter": "qa",
+      "text": "複数ツールの併用——Claude Code で始めて、細かい修正は Cursor で直接やる、というスタイル。具体的な一行を書き換えたいときは、僕は Cursor の方がストレートに届く。",
+      "audio": "audio/b124.mp3",
+      "duration_sec": 10.579,
+      "voice_style": "[明るく]",
+      "prosody": {
+        "speed": 1.15,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b125",
+      "type": "narration",
+      "kind": "p",
+      "chapter": "qa",
+      "text": "不慣れなコードベースへの入り方は、機能実装の前に、Claude Code で地図作りをします：「認証はこのコードベースのどこで起きている？」「これと似た機能はどこにある？」「ファイル名とクラス名を教えて」。こうしてメンタルモデルを先に構築してから、実装フェーズに入る。この順番を守ると、バイブコードに逃げずに、ちゃんと自分で理解しながら PR が出せます。",
+      "audio": "audio/b125.mp3",
+      "duration_sec": 24.895,
+      "voice_style": "[問いかけるように]",
+      "prosody": {
+        "speed": 1.1,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "p017",
+      "type": "piyo",
+      "kind": "piyo",
+      "chapter": "qa",
+      "anchor": {
+        "mode": "after",
+        "ref": "b125"
+      },
+      "text": "ここまで聞いてくれて、ほんとうにありがとう！全部やらなくていい。まずは小さい仕事で、Claude に「計画を作って」ってお願いしてみるところから。一歩踏み出すと、次の景色が見えてくるよ。じゃあまた次の回で、元気に会おうね。Piyofeed でした！",
+      "audio": "audio/p017.mp3",
+      "duration_sec": 15.647,
+      "voice_style": "[元気よく]",
+      "prosody": {
+        "speed": 1.18,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b126",
+      "type": "narration",
+      "kind": "h2",
+      "chapter": "checklist",
+      "text": "責任あるバイブコーディング・チェックリスト",
+      "audio": "audio/b126.mp3",
+      "duration_sec": 2.717,
+      "voice_style": "[明るく]",
+      "prosody": {
+        "speed": 1.05,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b127",
+      "type": "narration",
+      "kind": "p",
+      "chapter": "checklist",
+      "text": "今日からの実務に落とせる具体項目。チェックが増えるほど、Claude と安全な距離感で仕事ができるようになる。",
+      "audio": "audio/b127.mp3",
+      "duration_sec": 7.105,
+      "voice_style": "[明るく]",
+      "prosody": {
+        "speed": 1.15,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b128",
+      "type": "narration",
+      "kind": "h3",
+      "chapter": "checklist",
+      "text": "心構え編",
+      "audio": "audio/b128.mp3",
+      "duration_sec": 1.254,
+      "voice_style": "[楽しく]",
+      "prosody": {
+        "speed": 1.1,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b129",
+      "type": "narration",
+      "kind": "h3",
+      "chapter": "checklist",
+      "text": "実践編",
+      "audio": "audio/b129.mp3",
+      "duration_sec": 1.254,
+      "voice_style": "[楽しく]",
+      "prosody": {
+        "speed": 1.1,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    },
+    {
+      "id": "b130",
+      "type": "narration",
+      "kind": "h3",
+      "chapter": "checklist",
+      "text": "マインドセット編",
+      "audio": "audio/b130.mp3",
+      "duration_sec": 1.28,
+      "voice_style": "[楽しく]",
+      "prosody": {
+        "speed": 1.1,
+        "volume": 0
+      },
+      "audio_version": "1776718235"
+    }
+  ],
+  "transition_audio": {
+    "opening": {
+      "audio": "audio/opening.mp3",
+      "text": "バイブコーディング、プロの作法。Claude Code 完全ガイド。",
+      "voice_style": "[期待を込めて]",
+      "audio_version": "1776718863"
+    },
+    "chapter_intro": {
+      "audio": "audio/chapter_intro.mp3",
+      "text": "はじめに。",
+      "voice_style": "[印象的に]",
+      "audio_version": "1776718863"
+    },
+    "chapter_speaker": {
+      "audio": "audio/chapter_speaker.mp3",
+      "text": "第1章。話し手について。",
+      "voice_style": "[印象的に]",
+      "audio_version": "1776718863"
+    },
+    "chapter_definition": {
+      "audio": "audio/chapter_definition.mp3",
+      "text": "第2章。バイブコーディングとは。",
+      "voice_style": "[印象的に]",
+      "audio_version": "1776718863"
+    },
+    "chapter_dangers": {
+      "audio": "audio/chapter_dangers.mp3",
+      "text": "第3章。落とし穴と期待値。",
+      "voice_style": "[印象的に]",
+      "audio_version": "1776718863"
+    },
+    "chapter_exponential": {
+      "audio": "audio/chapter_exponential.mp3",
+      "text": "第4章。指数関数の波。",
+      "voice_style": "[印象的に]",
+      "audio_version": "1776718863"
+    },
+    "chapter_leaf-nodes": {
+      "audio": "audio/chapter_leaf-nodes.mp3",
+      "text": "第5章。葉ノード戦略。",
+      "voice_style": "[印象的に]",
+      "audio_version": "1776718863"
+    },
+    "chapter_be-pm": {
+      "audio": "audio/chapter_be-pm.mp3",
+      "text": "第6章。クロードのピーエムになる。",
+      "voice_style": "[印象的に]",
+      "audio_version": "1776718863"
+    },
+    "chapter_case-study": {
+      "audio": "audio/chapter_case-study.mp3",
+      "text": "第7章。にまんにせん行のピーアール。",
+      "voice_style": "[印象的に]",
+      "audio_version": "1776718863"
+    },
+    "chapter_closing": {
+      "audio": "audio/chapter_closing.mp3",
+      "text": "第8章。持ち帰るべきこと。",
+      "voice_style": "[印象的に]",
+      "audio_version": "1776718863"
+    },
+    "chapter_qa": {
+      "audio": "audio/chapter_qa.mp3",
+      "text": "第9章。質疑応答。",
+      "voice_style": "[印象的に]",
+      "audio_version": "1776718863"
+    },
+    "chapter_checklist": {
+      "audio": "audio/chapter_checklist.mp3",
+      "text": "第10章。チェックリスト。",
+      "voice_style": "[印象的に]",
+      "audio_version": "1776718863"
+    }
+  },
+  "total_duration_sec": 1566.55
+}

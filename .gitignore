@@ -1,0 +1,28 @@
+__pycache__/
+*.pyc
+.venv/
+.DS_Store
+Thumbs.db
+
+# 自動バックアップ（初回実行時のオリジナル HTML）
+*.bak
+
+# ローカル開発用の Claude Code 設定
+.claude/
+
+# 元動画ファイル（ソースデータ、アプリ本体は未使用）
+*.mp4
+*.mov
+*.avi
+
+# 元動画の字幕・音声・ログ（アプリ本体は未使用、公開不要）
+uploads/
+
+# ローカル設定（API キーなど）
+build/local_config.py
+
+# ビルドパイプライン一式（HTML アプリの実行には不要）
+build/
+narration_texts/
+piyo_script_draft.md
+DESIGN.md

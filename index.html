@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+
+<html lang="ja">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Claude Code とバイブコーディング — Anthropic Eric 氏による完全ガイド</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600;700&amp;family=Noto+Sans+JP:wght@400;500;600;700&amp;family=Inter+Tight:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&amp;display=swap" rel="stylesheet"/>
+<link href="styles.css" rel="stylesheet"/>
+<link href="narrator.css" rel="stylesheet"/>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="page">
+<!-- ========== SIDEBAR ========== -->
+<aside class="sidebar">
+<div class="brand">Claude Code</div>
+<div class="brand-sub">Vibe Coding in Prod, Responsibly</div>
+<nav>
+<ul class="toc" id="toc">
+<li><a href="#intro"><span class="toc-num">00</span>はじめに</a></li>
+<li><a href="#speaker"><span class="toc-num">01</span>話し手について</a></li>
+<li><a href="#definition"><span class="toc-num">02</span>バイブコーディングとは</a></li>
+<li><a href="#dangers"><span class="toc-num">03</span>落とし穴と期待値</a></li>
+<li><a href="#exponential"><span class="toc-num">04</span>指数関数の波</a></li>
+<li><a class="toc-sub" href="#compiler">├ コンパイラの喩え</a></li>
+<li><a class="toc-sub" href="#old-problem">└ 古くて新しい悩み</a></li>
+<li><a href="#leaf-nodes"><span class="toc-num">05</span>葉ノード戦略</a></li>
+<li><a href="#be-pm"><span class="toc-num">06</span>Claude の PM になる</a></li>
+<li><a class="toc-sub" href="#context">├ コンテキストの集め方</a></li>
+<li><a class="toc-sub" href="#right-q">└ 正しい問いを立てる</a></li>
+<li><a href="#case-study"><span class="toc-num">07</span>2万2千行のPR</a></li>
+<li><a href="#closing"><span class="toc-num">08</span>持ち帰るべきこと</a></li>
+<li><a href="#qa"><span class="toc-num">09</span>Q&amp;A</a></li>
+<li><a href="#checklist"><span class="toc-num">10</span>チェックリスト</a></li>
+</ul>
+</nav>
+</aside>
+<!-- ========== CONTENT ========== -->
+<main class="content">
+<!-- HEADER -->
+<header class="doc-header prose" id="intro">
+<div class="eyebrow">Anthropic · Code w/ Claude · 2025</div>
+<h1 data-narr-id="b001">バイブコーディング<br/>プロ の 作 法</h1>
+<p class="subtitle" data-narr-id="b002">Anthropic のリサーチャー Eric 氏による講演。<br/>Claude にコードを丸ごと任せる「バイブコーディング」を、どうすれば本番環境で責任を持って実践できるのか。指数関数の波をどう乗りこなすかの完全ガイド。</p>
+<div class="doc-meta">
+<div class="meta-item"><span class="meta-label">Speaker</span><span class="meta-value">Eric · Anthropic Research (Coding Agents)</span></div>
+<div class="meta-item"><span class="meta-label">Format</span><span class="meta-value">トーク + Q&amp;A（約 30 分）</span></div>
+<div class="meta-item"><span class="meta-label">Audience</span><span class="meta-value">ソフトウェアエンジニア・PM・技術経営</span></div>
+<div class="meta-item"><span class="meta-label">Reading time</span><span class="meta-value">約 18 分</span></div>
+</div>
+</header>
+<!-- CH1: Speaker -->
+<section class="chapter prose" id="speaker">
+<div class="chapter-header">
+<span class="chapter-num">Chapter 01</span>
+<h2 data-narr-id="b003">話し手について — ギプスの 2 ヶ月で学んだこと</h2>
+</div>
+<p class="lead" data-narr-id="b004">Eric 氏は Anthropic のリサーチャーで、<em>コーディングエージェント</em>の領域を専門としている。Barry Zhang 氏との共著論文「<strong>Building Effective Agents</strong>」で、Anthropic としてのエージェント設計のサイエンスとベストプラクティスを世に出した人物でもある。</p>
+<p data-narr-id="b005">しかし今回のトークのきっかけは、もっと個人的な出来事だった。<strong>昨年、自転車通勤中に手を骨折し、2 ヶ月間ギプス生活になった</strong>。そのあいだ、彼のコードは——自分の手では一行も書かれなかった。</p>
+<blockquote data-narr-id="b006">
+        そのギプスの 2 ヶ月間、僕のコードはすべて Claude が書いていた。
+        <cite>Eric</cite>
+</blockquote>
+<p data-narr-id="b007">「どうすればこれを<em>効果的に</em>回せるか」を本気で考えざるを得ない状況に置かれたのだ。そこでの学びは、やがて Anthropic の他プロダクトやモデル本体にも流れ込んでいった。今日のトークは、その 2 ヶ月と、その先にある「本番でのバイブコーディング」の話である。</p>
+<div class="callout">
+<span class="callout-label">なぜこの話が面白いのか</span>
+<p data-narr-id="b008">制約は、思考を深くする。怪我という偶然が、Eric 氏を「AI にコードを任せるとはどういうことか」を最前線で考えざるを得ない立場に押し出した。この講演の実感のこもった言葉の源泉は、その 2 ヶ月にある。</p>
+</div>
+</section>
+<!-- CH2: Definition -->
+<section class="chapter prose" id="definition">
+<div class="chapter-header">
+<span class="chapter-num">Chapter 02</span>
+<h2 data-narr-id="b009">バイブコーディングとは — 定義を厳密にしておく</h2>
+</div>
+<p data-narr-id="b010">まず、言葉の定義から揃えよう。世の中には「AI を大量に使ってコードを書いてもらう＝バイブコーディング」と雑に同一視している人が多い。<strong>Eric 氏はそれは違うと言う。</strong></p>
+<p data-narr-id="b011">Cursor や Copilot を使って、AI が生成するコードを一行ずつ読んで取捨選択している——これはまだ<em>タイトなフィードバックループの中にいる</em>。コードを書いているのは人間で、AI は伴走者にすぎない。</p>
+<div class="pullquote" data-narr-id="b012">
+        Vibe coding is when you fully give into the vibes,<br/>
+        embrace exponentials, and forget that the code even exists.
+        <span class="pullquote-attr">Andrej Karpathy · バイブコーディングの原義</span>
+</div>
+<p data-narr-id="b013">Andrej Karpathy 氏のこの定義の核心は、最後の一節——<strong>「コードが存在することすら忘れる」</strong>——にある。Eric 氏が言う「バイブコーディング」も、常にこの意味で使われる。</p>
+<h3 data-narr-id="b014">なぜ世の中がざわついたのか</h3>
+<p data-narr-id="b015">バイブコーディングが注目を浴びたのは、<strong>エンジニアではない人々がコード生成に熱狂しはじめた瞬間</strong>だったからだ。Copilot や Cursor は結局エンジニア向けのツールだった。だがバイブコーディングは、コードを書いたことのない人でも、一人でアプリ全体を作り上げる扉を開いてしまった。</p>
+<p data-narr-id="b016">これは多くの人にとって巨大な解放だった——そしてもちろん、巨大な副作用も伴った。</p>
+</section>
+<!-- CH3: Dangers -->
+<section class="chapter prose" id="dangers">
+<div class="chapter-header">
+<span class="chapter-num">Chapter 03</span>
+<h2 data-narr-id="b017">落とし穴と期待値 — なぜ「おもちゃ」にしか見えないのか</h2>
+</div>
+<p data-narr-id="b018">副作用の代表例は、SNS をにぎわせた数々の事故である：</p>
+<ul>
+<li data-narr-id="b019"><strong>API キーの使用量がマックスに張り付く</strong>——コード上の不備で際限なく呼び出される</li>
+<li data-narr-id="b020"><strong>サブスクリプションの課金バイパス</strong>——認証や支払いロジックが穴だらけ</li>
+<li data-narr-id="b021"><strong>DB に得体の知れないデータが生成される</strong>——スキーマも権限も曖昧なまま突き進む</li>
+</ul>
+<p data-narr-id="b022">これらはすべて「<em>自分が今何をしているのか分かっていない人</em>」がプロダクションレベルのものを作ろうとしたときに起こる。</p>
+<h3 data-narr-id="b023">ポジティブ事例は、たいてい低リスク</h3>
+<p data-narr-id="b024">逆に、バイブコーディングがうまく機能している例はどうかというと、<strong>ほぼすべてが「低リスクな領域」</strong>だ。自作のビデオゲーム、一晩で作るサイドプロジェクト、バグが出ても笑い話で済む遊びの類。</p>
+<div class="callout warn">
+<span class="callout-label">ここで多くの人が思う素朴な疑問</span>
+<p data-narr-id="b025">実プロダクトに使うとリスクが跳ね上がり、うまくいっているのはオモチャばかり——なら、<em>バイブコーディングなんて気にしなくていいのでは？</em></p>
+</div>
+<p data-narr-id="b026">Eric 氏の答えは一言だ——<strong>「指数関数がある限り、気にするしかない」</strong>。次章で、この答えを真正面から解剖する。</p>
+</section>
+<!-- CH4: Exponential -->
+<section class="chapter" id="exponential">
+<div class="chapter-header prose">
+<span class="chapter-num">Chapter 04</span>
+<h2 data-narr-id="b027">指数関数の波 — 7 ヶ月で倍になる世界</h2>
+</div>
+<div class="prose">
+<p class="lead" data-narr-id="b028">AI がこなせる<strong>タスクの長さ</strong>（一度の指示で完結できる作業量）は、<em>約 7 ヶ月ごとに倍</em>になっている。2025 年の現在地は「およそ 1 時間分の仕事」。</p>
+<p data-narr-id="b029"><strong>今はまだバイブコーディングを無理にしなくていい。</strong>Cursor に任せ、Claude Code に機能を書かせ、出てきたコードをレビューする——そのやり方で十分やっていける。人間が密にループに関われる規模だからだ。</p>
+<h3 data-narr-id="b030">しかし、来年は？ 再来年は？</h3>
+<p data-narr-id="b031">1 時間が 2 時間になり、4 時間になり、1 日分の仕事、1 週間分の仕事をモデルが一息に吐き出すようになる。<strong>そのとき、コードを一行ずつ読むワークフローは物理的に追いつかない</strong>。</p>
+<blockquote data-narr-id="b032">
+        指数関数の波に乗りたいなら、どこかで「責任を持って手放す」方法を見つけなければならない。
+        <cite>Eric</cite>
+</blockquote>
+</div>
+<!-- DIAGRAM: Exponential Growth -->
+<div class="diagram">
+<svg style="width:100%;height:auto;max-width:720px;display:block;margin:0 auto;" viewbox="0 0 720 340" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<marker id="arr" markerheight="7" markerwidth="7" orient="auto" refx="9" refy="5" viewbox="0 0 10 10">
+<path d="M0,0 L10,5 L0,10 z" fill="var(--terracotta)"></path>
+</marker>
+</defs>
+<!-- Axis -->
+<line stroke="var(--rule-strong)" stroke-width="1.5" x1="60" x2="60" y1="40" y2="290"></line>
+<line stroke="var(--rule-strong)" stroke-width="1.5" x1="60" x2="680" y1="290" y2="290"></line>
+<text fill="var(--muted)" font-family="var(--sans)" font-size="11" x="40" y="48">長さ</text>
+<text fill="var(--muted)" font-family="var(--sans)" font-size="11" x="660" y="310">時間</text>
+<!-- Exponential curve -->
+<path d="M 60 280 Q 200 275 320 255 Q 440 215 540 145 Q 620 80 680 50" fill="none" stroke="var(--terracotta)" stroke-width="2.5"></path>
+<!-- Key points -->
+<g>
+<circle cx="200" cy="274" fill="var(--terracotta)" r="5"></circle>
+<text fill="var(--ink)" font-family="var(--jp-serif)" font-size="12" font-weight="600" x="180" y="260">30分</text>
+<text dy="20" fill="var(--muted)" font-family="var(--sans)" font-size="10" x="178" y="274">2024年</text>
+</g>
+<g>
+<circle cx="320" cy="255" fill="var(--terracotta)" r="6" stroke="var(--paper)" stroke-width="2"></circle>
+<text fill="var(--ink)" font-family="var(--jp-serif)" font-size="13" font-weight="700" x="300" y="240">1時間</text>
+<text dy="20" fill="var(--terracotta-deep)" font-family="var(--sans)" font-size="10" font-weight="600" x="296" y="254">今ここ</text>
+</g>
+<g>
+<circle cx="440" cy="215" fill="var(--terracotta)" r="5"></circle>
+<text fill="var(--ink)" font-family="var(--jp-serif)" font-size="12" font-weight="600" x="420" y="200">半日</text>
+<text dy="20" fill="var(--muted)" font-family="var(--sans)" font-size="10" x="414" y="214">2026年</text>
+</g>
+<g>
+<circle cx="540" cy="145" fill="var(--terracotta)" r="5"></circle>
+<text fill="var(--ink)" font-family="var(--jp-serif)" font-size="12" font-weight="600" x="520" y="130">1日</text>
+<text dy="20" fill="var(--muted)" font-family="var(--sans)" font-size="10" x="510" y="144">2027年?</text>
+</g>
+<g>
+<circle cx="630" cy="80" fill="var(--terracotta-deep)" r="6" stroke="var(--paper)" stroke-width="2"></circle>
+<text fill="var(--ink)" font-family="var(--jp-serif)" font-size="13" font-weight="700" x="595" y="64">1週間</text>
+<text dy="20" fill="var(--muted)" font-family="var(--sans)" font-size="10" x="595" y="78">そして…</text>
+</g>
+<!-- Dashed line: human review threshold -->
+<line stroke="var(--muted)" stroke-dasharray="5 4" stroke-width="1" x1="60" x2="680" y1="180" y2="180"></line>
+<text fill="var(--muted)" font-family="var(--sans)" font-size="10" x="500" y="175">人間が全行レビューできる上限</text>
+</svg>
+<div class="diagram-caption">図 1 — タスク長の指数関数。「今はまだ」読める。「来年は」読みきれない。</div>
+</div>
+<div class="prose">
+<h3 data-narr-id="b033" id="compiler">コンパイラの喩え — 歴史は繰り返す</h3>
+<p data-narr-id="b034">Eric 氏が好む喩えがある。<strong>コンパイラ黎明期</strong>——当時のエンジニアの多くは、コンパイラを信用していなかった。生成されたアセンブリを目で読み、「自分が書くのと同じようになっているか」を毎回確認していた。</p>
+<p data-narr-id="b035">だが、システムが大きくなるにつれ、そのやり方は<em>物理的に成立しなくなった</em>。どこかで「信じる」しかなくなる。</p>
+<div class="pullquote" data-narr-id="b036">
+        The code exists, but you no longer need to look at it.
+        コードは存在する、ただし読まなくていい。
+        <span class="pullquote-attr">コンパイラがもたらしたパラダイム転換</span>
+</div>
+<p data-narr-id="b037"><strong>僕らのソフトウェア業界全体への挑戦状は、ここにある</strong>——「プロダクトが存在することは忘れずに、コードが存在することを忘れる」。アセンブリは今もそこにある。だがほとんどの開発者は、もうアセンブリを読まずに良いソフトウェアを作れている。<em>同じことを、もう一段上のレイヤーで起こす</em>。</p>
+<h3 data-narr-id="b038" id="old-problem">古くて新しい悩み — 実は古典的マネジメント問題</h3>
+<p data-narr-id="b039">ここで Eric 氏は、ソフトウェア業界の外に目を向ける。この問題は実は、<strong>文明史レベルで繰り返されてきた古い問題</strong>だというのだ。</p>
+<ul>
+<li data-narr-id="b040"><strong>CTO</strong>はその専門領域の一線の現場よりコードが書けるとは限らない。が、優秀な専門家の成果物を評価する方法を持っている。</li>
+<li data-narr-id="b041"><strong>PM</strong>は、完成した機能のコードを読まない。だがプロダクトを使ってみて、意図通りに動くかを確かめられる。</li>
+<li data-narr-id="b042"><strong>CEO</strong>は会計の専門家ではない。それでも分かるキーファクトとデータのスライスを抜き打ちチェックすることで、全体財務モデルの健全性に自信を持てる。</li>
+</ul>
+<p data-narr-id="b043">つまり<strong>「自分が実装を理解していないものを、どう管理するか」</strong>は、世の中の全マネージャーが日常的に解いてきた問題である。ソフトウェアエンジニアだけが、これまで<em>純粋な個人コントリビューター</em>としてスタック全段を自分で理解することに慣れすぎていたのだ。</p>
+<div class="callout tip">
+<span class="callout-label">核心</span>
+<p data-narr-id="b044"><strong>実装を知らずとも検証可能な「抽象レイヤー」を見つけろ。</strong>これが、責任あるバイブコーディングの一行サマリである。</p>
+</div>
+</div>
+</section>
+<!-- CH5: Leaf Nodes -->
+<section class="chapter" id="leaf-nodes">
+<div class="chapter-header prose">
+<span class="chapter-num">Chapter 05</span>
+<h2 data-narr-id="b045">葉ノード戦略 — 技術的負債を「押し込める」場所</h2>
+</div>
+<div class="prose">
+<p class="lead" data-narr-id="b046">ただし、Eric 氏は一つだけ正直な but を付け加える。<strong>技術的負債（tech debt）</strong>だけは、今のところコードを読まずに検証する良い方法がない。</p>
+<p data-narr-id="b047">会計は監査で検証できる。プロダクトは使って検証できる。ところが技術的負債は、<em>実装自体の専門家</em>でないと見抜けない——これは現時点での厳然たる制約である。</p>
+<h3 data-narr-id="b048">戦略：葉ノードに集中する</h3>
+<p data-narr-id="b049">この制約を認めた上で、それでもバイブコーディングを本番に取り入れる方法がある。答えは、<strong>コードベースの「葉ノード」に集中すること</strong>。</p>
+</div>
+<!-- DIAGRAM: Tree with trunk and leaves -->
+<div class="diagram">
+<svg style="width:100%;height:auto;max-width:720px;display:block;margin:0 auto;" viewbox="0 0 720 320" xmlns="http://www.w3.org/2000/svg">
+<!-- Trunk (white = core architecture) -->
+<g>
+<line stroke="#F3ECDE" stroke-linecap="round" stroke-width="22" x1="360" x2="360" y1="280" y2="180"></line>
+<line opacity="0.3" stroke="var(--ink-2)" stroke-dasharray="2 3" stroke-linecap="round" stroke-width="1" x1="360" x2="360" y1="280" y2="180"></line>
+</g>
+<!-- Major branches (white = important) -->
+<line stroke="#F3ECDE" stroke-linecap="round" stroke-width="14" x1="360" x2="230" y1="200" y2="130"></line>
+<line stroke="#F3ECDE" stroke-linecap="round" stroke-width="14" x1="360" x2="490" y1="200" y2="130"></line>
+<line stroke="#F3ECDE" stroke-linecap="round" stroke-width="14" x1="360" x2="370" y1="180" y2="90"></line>
+<!-- Sub branches (white) -->
+<line stroke="#F3ECDE" stroke-linecap="round" stroke-width="9" x1="230" x2="150" y1="130" y2="90"></line>
+<line stroke="#F3ECDE" stroke-linecap="round" stroke-width="9" x1="230" x2="200" y1="130" y2="60"></line>
+<line stroke="#F3ECDE" stroke-linecap="round" stroke-width="9" x1="490" x2="570" y1="130" y2="90"></line>
+<line stroke="#F3ECDE" stroke-linecap="round" stroke-width="9" x1="490" x2="520" y1="130" y2="60"></line>
+<line stroke="#F3ECDE" stroke-linecap="round" stroke-width="9" x1="370" x2="320" y1="90" y2="50"></line>
+<line stroke="#F3ECDE" stroke-linecap="round" stroke-width="9" x1="370" x2="420" y1="90" y2="50"></line>
+<!-- Outlines for branches -->
+<line opacity="0.6" stroke="var(--rule-strong)" stroke-width="1.2" x1="360" x2="360" y1="280" y2="180"></line>
+<!-- Leaf nodes (orange = vibe codable) -->
+<g fill="var(--terracotta)">
+<circle cx="130" cy="80" r="10"></circle>
+<circle cx="190" cy="45" r="10"></circle>
+<circle cx="215" cy="55" r="8"></circle>
+<circle cx="160" cy="65" r="9"></circle>
+<circle cx="585" cy="78" r="10"></circle>
+<circle cx="540" cy="50" r="9"></circle>
+<circle cx="515" cy="55" r="8"></circle>
+<circle cx="560" cy="65" r="9"></circle>
+<circle cx="315" cy="40" r="10"></circle>
+<circle cx="425" cy="40" r="10"></circle>
+<circle cx="360" cy="35" r="8"></circle>
+<circle cx="400" cy="20" r="9"></circle>
+<circle cx="335" cy="20" r="8"></circle>
+</g>
+<!-- Legend -->
+<g>
+<circle cx="90" cy="290" fill="var(--terracotta)" r="7"></circle>
+<text fill="var(--ink)" font-family="var(--jp-serif)" font-size="13" x="105" y="294">葉ノード（バイブコード OK）</text>
+<line stroke="#F3ECDE" stroke-width="6" x1="380" x2="410" y1="290" y2="290"></line>
+<line opacity="0.6" stroke="var(--rule-strong)" stroke-width="1" x1="380" x2="410" y1="290" y2="290"></line>
+<text fill="var(--ink)" font-family="var(--jp-serif)" font-size="13" x="420" y="294">幹・枝（人間が設計・レビュー）</text>
+</g>
+</svg>
+<div class="diagram-caption">図 2 — 葉ノードに技術的負債があっても波及しない。幹は深く理解せよ。</div>
+</div>
+<div class="prose">
+<h3 data-narr-id="b050">なぜ葉ノードなら OK なのか</h3>
+<ul>
+<li data-narr-id="b051"><strong>何も依存していない</strong>——末端機能なので、負債が周囲に波及しない</li>
+<li data-narr-id="b052"><strong>変更される可能性が低い</strong>——端の装飾、末端の機能は、書き換えが少ない</li>
+<li data-narr-id="b053"><strong>上に何かが積み上がらない</strong>——別の機能の土台にはならない</li>
+</ul>
+<p data-narr-id="b054">逆に<strong>幹や太い枝——中核アーキテクチャ、共有インフラ、横断ユーティリティ</strong>——は、人間が今後も深く理解し続ける必要がある。そこにこそ他の機能が積み上がり、そこが拡張可能で読みやすく柔軟であることが、組織全体の速度を決める。</p>
+<div class="callout tip">
+<span class="callout-label">朗報：境界は動く</span>
+<p data-narr-id="b055">モデルは毎月賢くなっている。Eric 氏は「この 1〜2 週間 Claude 4 を使って、3.7 の頃よりずっと信頼できるようになった」と語る。<strong>「葉ノードにしか使えない」という境界は、年々内側（幹側）へ侵食していく</strong>。</p>
+</div>
+</div>
+</section>
+<!-- CH6: Be PM -->
+<section class="chapter prose" id="be-pm">
+<div class="chapter-header">
+<span class="chapter-num">Chapter 06</span>
+<h2 data-narr-id="b056">Claude の PM になる — 成功の核</h2>
+</div>
+<p class="lead" data-narr-id="b057">バイブコーディングで成功するための、Eric 氏のたった一つのアドバイス——</p>
+<div class="pullquote" data-narr-id="b058">
+        Ask not what Claude can do for you,<br/>
+        but what you can do for Claude.
+        <span class="pullquote-attr">Eric · JFK へのオマージュとして</span>
+</div>
+<p data-narr-id="b059">バイブコーディング中、あなたの役割は<strong>「Claude のプロダクトマネージャー」</strong>である。PM のように考えよ：<em>このタスクで成功するために、新入社員ならどんなガイダンスとコンテキストが要るか？</em></p>
+<h3 data-narr-id="b060" id="context">コンテキストの集め方 — 15〜20 分を投資する</h3>
+<p data-narr-id="b061">多くの人は、AI に対して<strong>短いキャッチボール型</strong>のやり取りをしがちだ：「この機能作って」「このバグ直して」。しかし、もし出社初日の新入社員に「この機能を今すぐ実装して」とだけ言ったら？——成功できる見込みは、ほぼゼロだ。</p>
+<p data-narr-id="b062">Eric 氏は、機能を Claude に任せるとき<strong>最初の 15〜20 分をコンテキスト集めに使う</strong>という。しかも、その時間は「人間が一人でプロンプトを書いている時間」ではない：</p>
+<ul>
+<li data-narr-id="b063"><strong>別セッションで Claude と会話</strong>する。コードベースを探検させ、関連ファイルを探させる</li>
+<li data-narr-id="b064">一緒に<strong>計画を練る</strong>——何をしたいか、どのファイルを触るか、既存のどのパターンに従うべきか</li>
+<li data-narr-id="b065">その対話の結晶として、<strong>一つのプロンプト（または計画書）</strong>を作る</li>
+<li data-narr-id="b066">それを携え、<strong>別の新しいコンテキスト</strong>に移って、「この計画を実行して」と指示</li>
+</ul>
+<p data-narr-id="b067">この手間を前払いすると、Claude の成功率は<em>劇的に跳ね上がる</em>。逆にここを省略すると、後段で何度も手戻りする。</p>
+<h3 data-narr-id="b068" id="right-q">正しい問いを立てる — 全員がバイブコードすべきとは限らない</h3>
+<p data-narr-id="b069">ここで Eric 氏は、トークのタイトルに反する正直な告白をする。</p>
+<blockquote data-narr-id="b070">
+        I don't think that vibe coding in prod is for everybody.
+        本番でのバイブコーディングは、全員に向いているわけではない。
+        <cite>Eric</cite>
+</blockquote>
+<p data-narr-id="b071">完全に非技術的な人が<strong>ゼロからビジネスを構築する</strong>のは危険だ、と彼は言う。なぜか——<em>正しい問いを立てられない</em>からだ。PM が仕様を詰められないのと同じで、Claude の PM が Claude に効果的な指示を出せない。</p>
+<div class="callout">
+<span class="callout-label">線の引き方</span>
+<p data-narr-id="b072">ゲームや創作、個人の道具作りにおけるバイブコーディングは素晴らしい。しかし<strong>本番のプロダクションシステム</strong>には、「正しい問いを立てられる」だけの技術的理解が必要。ここは区別すべき、と Eric 氏は明確に線を引く。</p>
+</div>
+</section>
+<!-- CH7: Case Study -->
+<section class="chapter prose" id="case-study">
+<div class="chapter-header">
+<span class="chapter-num">Chapter 07</span>
+<h2 data-narr-id="b073">2 万 2 千行の PR — Anthropic 社内の実例</h2>
+</div>
+<p data-narr-id="b074">抽象論はここまで。Eric 氏は、Anthropic 社内で最近起きた<strong>生々しい実例</strong>を紹介する。</p>
+<div class="callout">
+<span class="callout-label">事実</span>
+<p data-narr-id="b075">Anthropic の本番<strong>強化学習（RL）コードベース</strong>に、<strong>22,000 行</strong>にわたる変更を含む PR がマージされた。このコードの大部分は、Claude が書いた。</p>
+</div>
+<p data-narr-id="b076">ではどうやって、この規模を<em>責任を持って</em>ねじ込めたのか。Eric 氏は 4 つの要素を挙げる：</p>
+<!-- DIAGRAM: 4 pillars of responsible delivery -->
+<div class="feat-grid">
+<div class="feat-card" data-narr-id="b077">
+<div class="feat-num">PILLAR 01</div>
+<h4>Claude の PM に徹した</h4>
+<p>単発プロンプトでマージしたのではない。要件定義、Claude への誘導、システム設計——<strong>数日分の人間の仕事</strong>が前段にあった。PM ロールを全員が自覚的に引き受けた。</p>
+</div>
+<div class="feat-card" data-narr-id="b078">
+<div class="feat-num">PILLAR 02</div>
+<h4>変更を葉ノードに集中</h4>
+<p>近い将来、変更が入らないと分かっている末端機能に意図的に集中。<strong>「多少の負債があってもこの場所なら許容できる」</strong>ラインを引いた。</p>
+</div>
+<div class="feat-card" data-narr-id="b079">
+<div class="feat-num">PILLAR 03</div>
+<h4>幹部分は人間レビュー</h4>
+<p>拡張性が重要になる部分だけ、徹底的に人間が読んだ。<strong>メリハリ</strong>のついたレビュー配分。</p>
+</div>
+<div class="feat-card" data-narr-id="b080">
+<div class="feat-num">PILLAR 04</div>
+<h4>検証可能な設計</h4>
+<p>入力・出力を人間が確認しやすい形に<strong>意図的に設計</strong>。ストレステストを長時間走らせて安定性を実測。「読まなくても確かめられる」チェックポイントを仕込んだ。</p>
+</div>
+</div>
+<h3 data-narr-id="b081">結果 — 自信は「手書きレビュー」と同等</h3>
+<p data-narr-id="b082">結論として、この PR に対する<strong>信頼感は、普段の変更と同等</strong>まで持ち上がった。しかも所要時間は<em>手で書いてすべてをレビューする場合のほんの一部</em>。</p>
+<p class="lead" data-narr-id="b083">そしてもう一つ、Eric 氏が興奮を隠さず語ったのは——</p>
+<blockquote data-narr-id="b084">
+        これが一番ワクワクしたのは、1 週間を節約したこと自体より、<br/>
+        「<strong>これができる</strong>」と知ったあとに、考え方そのものが変わったことだ。
+        <cite>Eric</cite>
+</blockquote>
+<p data-narr-id="b085">以前は「2 週間かかるから今回は見送ろう」としていた機能が、<strong>1 日でできるなら、やっちゃおう</strong>になる。ソフトウェアの限界費用が下がり、<em>消費と創造の容量が一段上がる</em>——そこが本当の恩恵だと彼は言う。</p>
+</section>
+<!-- CH8: Closing -->
+<section class="chapter prose" id="closing">
+<div class="chapter-header">
+<span class="chapter-num">Chapter 08</span>
+<h2 data-narr-id="b086">持ち帰るべきこと — 4 つのクロージング</h2>
+</div>
+<p class="lead" data-narr-id="b087">Eric 氏は、トークの最後に、<strong>明日から使える 4 つの原則</strong>に凝縮する。</p>
+<ol class="steps">
+<li data-narr-id="b088">
+<h4>Be Claude's PM.</h4>
+<p>Claude の PM になりきること。コンテキスト、要件、制約を、新入社員に説明するつもりで用意する。</p>
+</li>
+<li data-narr-id="b089">
+<h4>Focus on leaf nodes.</h4>
+<p>バイブコーディングは葉ノードに。<em>中核アーキテクチャと基盤システムは人間の領域</em>として守る。</p>
+</li>
+<li data-narr-id="b090">
+<h4>Think about verifiability.</h4>
+<p>「コードを読まずに正しさをどう確かめるか？」——これを<strong>設計段階から</strong>問い続ける。入出力を検証可能に、チェックポイントを仕込む。</p>
+</li>
+<li data-narr-id="b091">
+<h4>Remember the exponential.</h4>
+<p>今日はまだバイブコーディングをしなくていい。<strong>1〜2 年後には、それが大きなディスアドバンテージになる</strong>。モデルが 1 週間分の仕事を出力する世界で、「全行読む／全行書く」を掲げる人は、ボトルネックになる。</p>
+</li>
+</ol>
+<div class="callout tip">
+<span class="callout-label">Eric からのメッセージ</span>
+<p data-narr-id="b092"><em>これは、今後数年のソフトウェア産業にとって最大のチャレンジの一つになる。</em>——だからこそ、今のうちに手触りを獲得しておこう。</p>
+</div>
+</section>
+<!-- CH9: QA -->
+<section class="chapter prose" id="qa">
+<div class="chapter-header">
+<span class="chapter-num">Chapter 09</span>
+<h2 data-narr-id="b093">Q&amp;A — 会場からの質問</h2>
+</div>
+<details class="qa" open="">
+<summary data-narr-id="b094">かつては構文エラーやライブラリ連携で「苦労して」学んだ。今後、良いバイブコーダー／良い PM になるには？</summary>
+<div class="qa-body">
+<p data-narr-id="b095">心配な面と楽観的な面、両方あります。<strong>心配な面</strong>は、「苦労の中でしか学べないもの」に手が届きにくくなること。とはいえ、大学時代の教授が「今の若い奴らはアセンブリを手で書いたことがないから本当には速いコードが書けない」と嘆いていたのと、同じ種類の変化でもあります。</p>
+<p data-narr-id="b096"><strong>楽観的な面</strong>は、僕自身、AI ツールを使うと<em>圧倒的に速く新しいことを学べる</em>こと。Claude と一緒にコーディングしている時、「このライブラリ見たことない、教えて。なぜこれを選んだの？他と比べてどう違う？」と聞けば、常駐のペアプログラマーとして答えが返ってくる。</p>
+<p data-narr-id="b097"><strong>怠け者は学ばなくなる。</strong>でも学びたい人にとっては、これほど豊かな時代はない。Claude は、自分がバイブコードで作ったものの中身を一緒に読み解いてくれる。</p>
+<p data-narr-id="b098">もう一つの面——<em>「良いアーキテクチャだったか」が分かるサイクル</em>が、今まで 2 年かかっていたものが 6 ヶ月に縮む可能性がある。本気で学ぼうとするエンジニアは、同じ暦期間で<strong>4 倍の数のレッスン</strong>を吸収できる。</p>
+</div>
+</details>
+<details class="qa">
+<summary data-narr-id="b099">プリプラニングで「情報を与えすぎ」と「足りない」のバランスは？ PRD のような定型テンプレを使っている？</summary>
+<div class="qa-body">
+<p data-narr-id="b100"><strong>何を大事にしているかで変わります。</strong>実装の詳細にこだわらないタスクなら、「要件はこれ、最終状態はこれ」だけ書いて、実装方針には触れない。一方、コードベースを熟知している領域では、「このクラスを使って、この類似機能を参考に」とかなり踏み込む。</p>
+<p data-narr-id="b101">全体としては——<strong>過剰に制約しない方が、モデルは良い仕事をする</strong>。厳格なテンプレ運用にそれほどこだわる必要はない。<em>新入社員に渡すつもりで</em>——それくらいの温度感で十分です。</p>
+</div>
+</details>
+<details class="qa">
+<summary data-narr-id="b102">セキュリティとの両立は？ 先日、有名バイブコードアプリ 10 個がハッキングされた事件もあった。</summary>
+<div class="qa-body">
+<p data-narr-id="b103">これは<strong>まさに「Claude の PM」の話</strong>に戻ります。PM として「どこが危険か、どこが安全か、どこを注意深く扱うべきか」を<em>十分に</em>理解していること。</p>
+<p data-narr-id="b104">メディアで騒がれているバイブコーディング事故の多くは、<strong>本来、本番システムを書くべきではない人</strong>が書いてしまったケース。言い方が悪かったので言い直すと——<em>重要な本番システムをバイブコードすべきではない層がやってしまっている</em>ケース、です。</p>
+<p data-narr-id="b105">Anthropic の先の 2 万 2 千行の例は、<strong>完全にオフライン環境で動く</strong>システムだった。だからこそセキュリティ面で「絶対に事故は起こり得ない」という高い確信を持てた。バイブコーディングの適用範囲は、<em>状況と文脈で判断</em>するのが王道です。</p>
+</div>
+</details>
+<details class="qa">
+<summary data-narr-id="b106">世界人口の 0.5% 未満がソフトウェア開発者。ノンエンジニアがもっと安全にバイブコードで構築できるようになるには、プロダクトはどう変わるべき？</summary>
+<div class="qa-body">
+<p data-narr-id="b107"><strong>「証明可能に正しい」フレームワークやプロダクト</strong>がたくさん生まれてほしい。例えば——バックエンドで危ない部分（決済、認証）は既製で組み込み済み、ユーザーは<em>UI レイヤーだけを埋める</em>ような、空欄穴埋め型のサンドボックス。</p>
+<p data-narr-id="b108">最もシンプルな先行例は <strong>Claude Artifacts</strong>。認証も決済もない、フロントエンドのみの環境だから、どれだけ乱暴にコードを生成しても安全。この発想を<em>バックエンド付き</em>で、どんな乱戦が起きても壊れないホスティング環境として実装したプロダクトがあれば、それは面白いビジネスになる。</p>
+<p data-narr-id="b109">バイブコーディングと<em>補完関係</em>にあるツールを誰か作ってください——僕たちもそれに期待しています。</p>
+</div>
+</details>
+<details class="qa">
+<summary data-narr-id="b110">テスト駆動開発のコツは？ 実装を先に書かせるとテストが後付けになりがち。</summary>
+<div class="qa-body">
+<p data-narr-id="b111">TDD は<strong>バイブコーディングでとても有効</strong>です。テストケースが理解できる範囲なら、それ自体が検証の抽象レイヤーになるから。</p>
+<p data-narr-id="b112">Claude は放っておくと<em>「実装に密着しすぎたテスト」</em>に寄りがち。僕はかなり明示的に<strong>「エンドトゥエンドのテストを 3 つ書いて。ハッピーパス、エラーケース A、エラーケース B。全体で 3 つだけ」</strong>と指定します。このくらい規範的な方が、テストが「自分が読んで分かる抽象レイヤー」に留まってくれる。</p>
+<p data-narr-id="b113">バイブコーディング時、<em>コード本体より先にテストだけは必ず読む</em>——テストに合意できて、それが通っているなら、実装への信頼度は一気に上がる。</p>
+</div>
+</details>
+<details class="qa">
+<summary data-narr-id="b114">「指数関数を受け入れろ」とは具体的にどういうこと？ モデルは改善するとはいえ、全軸で同じように伸びるわけでは？</summary>
+<div class="qa-body">
+<p data-narr-id="b115">鋭い質問です。指数関数の本質は「毎年良くなる」という話ではなく——<strong>想像できる速度より速く良くなる</strong>という話なんです。ある点を超えると、ただ線形に増えているようには見えなくなる。<em>ワイルドな領域</em>に一気に行く。</p>
+<p data-narr-id="b116">Dario（CEO）と Mike Krieger（CPO）のトークに印象的な言葉がある——<em>「Machines of Loving Grace はサイエンスフィクションではない。プロダクトロードマップだ」</em>。遠い未来の話に聞こえるけど、指数曲線に乗っていると、想像の外側へ高速で進む。</p>
+<p data-narr-id="b117">90 年代のコンピュータに関わっていた人に「RAM が数 KB しかない」と言われ、「はい、今は数 KB、来年は数 KB 増えます」と答えたとしたら——現在の<strong>テラバイト</strong>という答えは出てこない。2 倍どころか、<em>百万倍</em>になった。</p>
+<p data-narr-id="b118">「指数関数を受け入れる」とは、<em>20 年後のモデルは今より 2 倍賢い</em>という予想ではなく、<strong>今より百万倍賢く、百万倍速い</strong>世界を前提に考え始めることです。それは正直、どういう世界なのか、僕らにはまだちゃんと想像できません。</p>
+</div>
+</details>
+<details class="qa">
+<summary data-narr-id="b119">ターミナルの Claude Code 派と VS Code/Cursor 派、どちらを使う？ Claude Code の <code>/compact</code> はどれくらいの頻度で？</summary>
+<div class="qa-body">
+<p data-narr-id="b120"><strong>両方</strong>使います。VS Code の隣でターミナル Claude Code を開き、Claude Code に編集させつつ、VS Code 側で進行を眺める——この形が多い。純粋なバイブコーディングというより、テストだけ読むくらいのハイブリッドです。</p>
+<p data-narr-id="b121"><code>/compact</code> は、<em>人間の開発者なら「ここで昼休憩入れたいな」と思う区切り</em>で使います。たとえば「関連ファイルを全部探させてプランを作らせた」あと、<strong>そのプランをドキュメントに書き出させてから</strong> compact する。これで、計画立案に使った 100K トークンが、数千トークンの抽出結果に圧縮される。</p>
+<p data-narr-id="b122">セッションを清潔に保つコツは、「良いストッピングポイントで区切る」ことです。</p>
+</div>
+</details>
+<details class="qa">
+<summary data-narr-id="b123">複数の Claude Code を走らせたり、Git ワークツリーを使う運用は？ 不慣れなコードベースで素早く PR を出すコツは？</summary>
+<div class="qa-body">
+<p data-narr-id="b124"><strong>複数ツールの併用</strong>——Claude Code で始めて、細かい修正は Cursor で直接やる、というスタイル。具体的な一行を書き換えたいときは、僕は Cursor の方がストレートに届く。</p>
+<p data-narr-id="b125"><strong>不慣れなコードベースへの入り方</strong>は、機能実装の前に、Claude Code で<em>地図作り</em>をします：「認証はこのコードベースのどこで起きている？」「これと似た機能はどこにある？」「ファイル名とクラス名を教えて」。こうしてメンタルモデルを先に構築してから、<strong>実装フェーズに入る</strong>。この順番を守ると、バイブコードに逃げずに、ちゃんと自分で理解しながら PR が出せます。</p>
+</div>
+</details>
+</section>
+<!-- CH10: Checklist -->
+<section class="chapter prose" id="checklist">
+<div class="chapter-header">
+<span class="chapter-num">Chapter 10</span>
+<h2 data-narr-id="b126">責任あるバイブコーディング・チェックリスト</h2>
+</div>
+<p data-narr-id="b127">今日からの実務に落とせる具体項目。チェックが増えるほど、Claude と安全な距離感で仕事ができるようになる。</p>
+<div class="checklist">
+<h3 data-narr-id="b128">心構え編</h3>
+<div class="checklist-group">
+<div class="checklist-group-title">PM としてのマインドセット</div>
+<label class="check-item"><input type="checkbox"/><span class="box"></span><span class="text"><strong>自分は Claude の PM である</strong>と意識して取り組む</span></label>
+<label class="check-item"><input type="checkbox"/><span class="box"></span><span class="text">「この仕事で成功するために、新入社員なら何が必要か」を先に問う</span></label>
+<label class="check-item"><input type="checkbox"/><span class="box"></span><span class="text">短いキャッチボール型ではなく、<strong>計画を練ってから実装に移す</strong></span></label>
+<label class="check-item"><input type="checkbox"/><span class="box"></span><span class="text">コードを読まずに検証する<em>抽象レイヤー</em>を事前に設計しておく</span></label>
+</div>
+<div class="checklist-group">
+<div class="checklist-group-title">境界線の判断</div>
+<label class="check-item"><input type="checkbox"/><span class="box"></span><span class="text">バイブコーディングの適用範囲は<strong>葉ノード</strong>から始める</span></label>
+<label class="check-item"><input type="checkbox"/><span class="box"></span><span class="text">中核アーキテクチャ・基盤ユーティリティは<strong>人間の領域</strong>として守る</span></label>
+<label class="check-item"><input type="checkbox"/><span class="box"></span><span class="text">セキュリティ境界が関わる部分は特に慎重に扱う</span></label>
+<label class="check-item"><input type="checkbox"/><span class="box"></span><span class="text">「このシステムは本当にバイブコードしていいのか？」を着手前に自問</span></label>
+</div>
+</div>
+<div class="checklist">
+<h3 data-narr-id="b129">実践編</h3>
+<div class="checklist-group">
+<div class="checklist-group-title">コンテキストの前払い</div>
+<label class="check-item"><input type="checkbox"/><span class="box"></span><span class="text">最初の 15〜20 分は<strong>コンテキスト収集セッション</strong>に投資する</span></label>
+<label class="check-item"><input type="checkbox"/><span class="box"></span><span class="text">別セッションで Claude に<strong>コードベースを探検</strong>させる</span></label>
+<label class="check-item"><input type="checkbox"/><span class="box"></span><span class="text">計画を<strong>ドキュメントに書き出させて</strong>から本セッションへ移る</span></label>
+<label class="check-item"><input type="checkbox"/><span class="box"></span><span class="text">大量のトークンを使ったら <code>/compact</code> で要点だけ残す</span></label>
+</div>
+<div class="checklist-group">
+<div class="checklist-group-title">テストと検証</div>
+<label class="check-item"><input type="checkbox"/><span class="box"></span><span class="text">テストは「エンドトゥエンドで 3 つ（ハッピー＋エラー 2 つ）」と<strong>明示指定</strong></span></label>
+<label class="check-item"><input type="checkbox"/><span class="box"></span><span class="text">実装より先に<strong>テストだけは必ず読む</strong></span></label>
+<label class="check-item"><input type="checkbox"/><span class="box"></span><span class="text">安定性はストレステストで<strong>長時間実測</strong>する</span></label>
+<label class="check-item"><input type="checkbox"/><span class="box"></span><span class="text">入力・出力が人間に確認しやすい設計に<strong>意図的に</strong>する</span></label>
+</div>
+<div class="checklist-group">
+<div class="checklist-group-title">ワークフロー</div>
+<label class="check-item"><input type="checkbox"/><span class="box"></span><span class="text">Claude Code で始め、細かい修正は Cursor 等で手動——<strong>併用派で OK</strong></span></label>
+<label class="check-item"><input type="checkbox"/><span class="box"></span><span class="text">不慣れなコードベースでは、実装前に<strong>地図作り</strong>をさせる</span></label>
+<label class="check-item"><input type="checkbox"/><span class="box"></span><span class="text">「人間なら昼休憩を挟むな」という区切りで <code>/compact</code></span></label>
+</div>
+</div>
+<div class="checklist">
+<h3 data-narr-id="b130">マインドセット編</h3>
+<div class="checklist-group">
+<div class="checklist-group-title">指数関数を信じる</div>
+<label class="check-item"><input type="checkbox"/><span class="box"></span><span class="text">「今はまだ必要ない」と「1 年後は必須」を<strong>両立して認識</strong></span></label>
+<label class="check-item"><input type="checkbox"/><span class="box"></span><span class="text">「2 週間かかる機能」を「1 日で終わる」に思い直す訓練を積む</span></label>
+<label class="check-item"><input type="checkbox"/><span class="box"></span><span class="text">学びたいときは<strong>Claude に聞き返す</strong>——常駐ペアプロとして活用</span></label>
+<label class="check-item"><input type="checkbox"/><span class="box"></span><span class="text">アーキテクチャの成否が見える<strong>サイクル短縮</strong>を自分の学習に活かす</span></label>
+</div>
+<div class="checklist-group">
+<div class="checklist-group-title">コードを忘れる、プロダクトを忘れない</div>
+<label class="check-item"><input type="checkbox"/><span class="box"></span><span class="text">アセンブリを読まないのと同じように、いずれ<em>コードも読まない</em>未来を想像する</span></label>
+<label class="check-item"><input type="checkbox"/><span class="box"></span><span class="text">ただし<strong>プロダクトの責任</strong>は、人間が最後まで持つ</span></label>
+</div>
+</div>
+</section>
+<!-- Footer -->
+<footer class="doc-footer">
+<div class="mark">◆</div>
+<p>
+        Based on "How to Vibe Code in Prod Responsibly" talk by <strong>Eric</strong>, Anthropic Research · Coding Agents.<br/>
+        このガイドはトーク内容を元に構成した、非公式日本語完全版です。
+      </p>
+</footer>
+</main>
+</div>
+<!-- TWEAKS PANEL -->
+<div class="tweaks-panel" id="tweaks">
+<button class="active" data-theme-btn="light">☀ Light</button>
+<button data-theme-btn="dark">☾ Dark</button>
+</div>
+<script>
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "theme": "dark"
+}/*EDITMODE-END*/;
+</script>
+<script>
+/* ============ Theme ============ */
+function setTheme(t) {
+  document.documentElement.setAttribute('data-theme', t);
+  document.querySelectorAll('[data-theme-btn]').forEach(b => {
+    b.classList.toggle('active', b.getAttribute('data-theme-btn') === t);
+  });
+  try { localStorage.setItem('cc-theme', t); } catch(e) {}
+}
+document.querySelectorAll('[data-theme-btn]').forEach(b => {
+  b.addEventListener('click', () => {
+    const t = b.getAttribute('data-theme-btn');
+    setTheme(t);
+    window.parent?.postMessage({type: '__edit_mode_set_keys', edits: {theme: t}}, '*');
+  });
+});
+
+try {
+  const saved = localStorage.getItem('cc-theme');
+  if (saved) setTheme(saved);
+  else setTheme(TWEAK_DEFAULTS.theme || 'light');
+} catch(e) { setTheme('light'); }
+
+window.addEventListener('message', (e) => {
+  const d = e.data || {};
+  if (d.type === '__activate_edit_mode') document.getElementById('tweaks').classList.add('active');
+  if (d.type === '__deactivate_edit_mode') document.getElementById('tweaks').classList.remove('active');
+});
+window.parent?.postMessage({type: '__edit_mode_available'}, '*');
+
+/* ============ Scroll spy for TOC ============ */
+const tocLinks = document.querySelectorAll('#toc a');
+const sections = Array.from(tocLinks).map(a => document.querySelector(a.getAttribute('href'))).filter(Boolean);
+function onScroll() {
+  const y = window.scrollY + 120;
+  let active = sections[0];
+  for (const s of sections) {
+    if (s.offsetTop <= y) active = s;
+  }
+  tocLinks.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + active.id));
+  const total = document.body.scrollHeight - window.innerHeight;
+  const pct = Math.min(100, Math.max(0, (window.scrollY / total) * 100));
+  document.getElementById('progressBar').style.width = pct + '%';
+}
+window.addEventListener('scroll', onScroll, {passive: true});
+onScroll();
+
+tocLinks.forEach(a => a.addEventListener('click', (e) => {
+  const href = a.getAttribute('href');
+  if (href.startsWith('#')) {
+    e.preventDefault();
+    const el = document.querySelector(href);
+    if (el) window.scrollTo({top: el.offsetTop - 16, behavior: 'smooth'});
+  }
+}));
+</script>
+<script src="narrator.js"></script>
+</body>
+</html>

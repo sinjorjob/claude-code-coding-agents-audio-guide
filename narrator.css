@@ -1,0 +1,1502 @@
+/* ================= Narrator Player ================= */
+
+/* 再生中ブロックのハイライト */
+[data-narr-id] {
+  transition: background-color .4s ease, box-shadow .4s ease, opacity .3s ease;
+  border-radius: var(--radius-sm);
+}
+
+[data-narr-id].narr-active {
+  background: linear-gradient(
+    to right,
+    color-mix(in srgb, var(--terracotta) 18%, transparent) 0%,
+    color-mix(in srgb, var(--terracotta) 6%, transparent) 70%,
+    transparent 100%
+  );
+  box-shadow: inset 3px 0 0 var(--terracotta);
+  padding-left: 14px;
+  margin-left: -14px;
+}
+
+[data-narr-id].narr-past {
+  opacity: 0.55;
+}
+
+/* Piyoコメント視覚表現：周囲に装飾 */
+.piyo-bubble {
+  position: relative;
+  margin: 28px 0;
+  padding: 18px 22px 18px 56px;
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  border-left: 3px solid var(--ochre);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-soft);
+  font-family: var(--sans);
+  font-size: 0.96em;
+  line-height: 1.75;
+  color: var(--ink-2);
+}
+.piyo-bubble::before {
+  content: "🐤";
+  position: absolute;
+  left: 18px;
+  top: 16px;
+  font-size: 22px;
+  line-height: 1;
+  filter: saturate(0.85);
+}
+.piyo-bubble .piyo-label {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 0.7em;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ochre);
+  margin-bottom: 6px;
+  opacity: 0.9;
+}
+.piyo-bubble.narr-active {
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--ochre) 14%, var(--paper)) 0%,
+    var(--paper) 60%
+  );
+  border-left-color: var(--terracotta);
+  box-shadow: var(--shadow-card);
+  padding-left: 56px; margin-left: 0;
+}
+.piyo-bubble.narr-active::before { filter: none; transform: scale(1.08); transition: transform .3s ease; }
+
+/* ================= Floating Player Bar ================= */
+.narrator-bar {
+  position: fixed;
+  left: 50%;
+  bottom: 18px;
+  transform: translateX(-50%);
+  z-index: 80;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  background: color-mix(in srgb, var(--bg-elevated) 92%, transparent);
+  backdrop-filter: blur(14px) saturate(1.1);
+  -webkit-backdrop-filter: blur(14px) saturate(1.1);
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  box-shadow: var(--shadow-card);
+  font-family: var(--sans);
+  min-width: 560px;
+  max-width: calc(100vw - 40px);
+  transition: transform .3s ease, opacity .3s ease;
+}
+
+.narrator-bar.hidden {
+  transform: translateX(-50%) translateY(120%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.narrator-bar button {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--ink);
+  font: inherit;
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: 999px;
+  transition: background .15s ease, color .15s ease, border-color .15s ease;
+  line-height: 1;
+}
+.narrator-bar button:hover {
+  background: color-mix(in srgb, var(--terracotta) 10%, transparent);
+  color: var(--terracotta-deep);
+}
+.narrator-bar button.primary {
+  background: var(--terracotta);
+  color: #FFFBF4;
+  width: 42px;
+  height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+.narrator-bar button.primary:hover {
+  background: var(--terracotta-deep);
+  color: #FFFBF4;
+}
+
+.narrator-bar .nav-btn {
+  font-size: 14px;
+  opacity: 0.75;
+}
+.narrator-bar .nav-btn:hover { opacity: 1; }
+
+.narrator-bar .seek {
+  position: relative;
+  flex: 1;
+  height: 6px;
+  background: var(--rule);
+  border-radius: 999px;
+  overflow: hidden;
+  cursor: pointer;
+  margin: 0 6px;
+}
+.narrator-bar .seek .fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 0;
+  background: linear-gradient(90deg, var(--terracotta) 0%, var(--clay) 100%);
+  border-radius: 999px;
+  transition: width .15s linear;
+}
+.narrator-bar .seek .dot {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 12px; height: 12px;
+  margin-left: -6px;
+  transform: translateY(-50%);
+  background: var(--terracotta-deep);
+  border-radius: 50%;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--terracotta) 22%, transparent);
+  transition: left .15s linear;
+}
+
+.narrator-bar .time {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--muted);
+  white-space: nowrap;
+  min-width: 88px;
+  text-align: center;
+}
+
+.narrator-bar .rate {
+  font-family: var(--mono);
+  font-size: 12px;
+  min-width: 36px;
+  text-align: center;
+  opacity: 0.75;
+}
+
+/* エンディング専用フローティング ボタン（再生バーから独立） */
+.ending-fab {
+  position: fixed;
+  left: 20px;
+  bottom: 20px;
+  z-index: 79;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  height: 44px;
+  border: 1px solid rgba(255, 230, 200, 0.35);
+  border-radius: 999px;
+  /* テーマ依存しない、常に視認できる暖色グラデ */
+  background: linear-gradient(135deg, #C85A3E 0%, #D68A3A 55%, #C89B3C 100%);
+  color: #FFF7E8;
+  font-family: 'Shippori Mincho', 'EB Garamond', serif;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  box-shadow:
+    0 4px 14px -4px rgba(200, 90, 62, 0.55),
+    0 2px 6px rgba(0, 0, 0, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.28);
+  transition: transform 0.2s ease, box-shadow 0.25s ease, filter 0.2s ease;
+  box-sizing: border-box;
+}
+.ending-fab.hidden { display: none; }
+.ending-fab .ef-label {
+  font-size: 14px;
+  font-style: italic;
+  white-space: nowrap;
+}
+.ending-fab:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.08) saturate(1.08);
+  box-shadow:
+    0 8px 22px -4px rgba(200, 90, 62, 0.65),
+    0 3px 8px rgba(0, 0, 0, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+.ending-fab:focus-visible {
+  outline: 2px solid var(--terracotta);
+  outline-offset: 3px;
+}
+
+/* 呼吸するパルス（静かに気付かせる） */
+@keyframes endingFabPulse {
+  0%, 100% {
+    box-shadow:
+      0 4px 14px -4px rgba(200, 90, 62, 0.55),
+      0 2px 6px rgba(0, 0, 0, 0.18),
+      inset 0 1px 0 rgba(255, 255, 255, 0.28),
+      0 0 0 0 rgba(200, 90, 62, 0.5);
+  }
+  50% {
+    box-shadow:
+      0 4px 14px -4px rgba(200, 90, 62, 0.55),
+      0 2px 6px rgba(0, 0, 0, 0.18),
+      inset 0 1px 0 rgba(255, 255, 255, 0.28),
+      0 0 0 10px rgba(200, 90, 62, 0);
+  }
+}
+.ending-fab:not(.hidden) {
+  animation: endingFabPulse 2.6s ease-in-out infinite;
+}
+.ending-fab:hover { animation: none; }
+
+/* 狭い画面では少しコンパクトに */
+@media (max-width: 720px) {
+  .ending-fab {
+    padding: 9px 14px;
+    left: 14px;
+    bottom: 14px;
+  }
+  .ending-fab .ef-label { font-size: 13px; }
+}
+
+.narrator-bar .now {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--muted-2);
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  opacity: 0.85;
+}
+
+/* 起動前バッジ（右下に小さく） */
+.narrator-fab {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 79;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 18px 10px 14px;
+  background: var(--terracotta);
+  color: #FFFBF4;
+  border: none;
+  border-radius: 999px;
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: var(--shadow-card);
+  transition: transform .2s ease, background .2s ease;
+}
+.narrator-fab:hover {
+  background: var(--terracotta-deep);
+  transform: translateY(-2px);
+}
+.narrator-fab.hidden { display: none; }
+.narrator-fab::before {
+  content: "▶";
+  font-size: 14px;
+  line-height: 1;
+}
+
+/* ブロックホバー時の操作ヒント */
+[data-narr-id]:hover {
+  cursor: pointer;
+}
+.piyo-bubble[data-narr-id]:hover {
+  border-left-color: var(--terracotta);
+}
+
+/* ================= Cinematic Caption — Karaoke Edition ================= */
+
+/* --progress をアニメーション可能にする（CSS Houdini）*/
+@property --progress {
+  syntax: '<percentage>';
+  inherits: false;
+  initial-value: 0%;
+}
+
+.narrator-caption {
+  position: fixed;
+  top: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: 860px;
+  width: calc(100vw - 48px);
+  padding: 22px 28px 20px;
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  background:
+    linear-gradient(180deg,
+      color-mix(in srgb, var(--paper) 92%, var(--terracotta) 5%) 0%,
+      color-mix(in srgb, var(--paper) 92%, var(--ochre) 5%) 100%);
+  border: 1px solid color-mix(in srgb, var(--ink) 22%, transparent);
+  border-radius: 14px;
+  box-shadow:
+    0 80px 140px -40px color-mix(in srgb, var(--ink) 65%, transparent),
+    0 28px 60px -16px color-mix(in srgb, var(--ink) 32%, transparent),
+    0 3px 0 color-mix(in srgb, var(--ink) 8%, transparent),
+    inset 0 1px 0 color-mix(in srgb, #fff 60%, transparent),
+    inset 0 -1px 0 color-mix(in srgb, var(--ink) 4%, transparent);
+  z-index: 70;
+  overflow: hidden;
+  transition:
+    opacity .45s cubic-bezier(.2,.8,.2,1),
+    transform .55s cubic-bezier(.2,.8,.2,1);
+  isolation: isolate;
+}
+.narrator-caption.hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(-50%) translateY(-16px) scale(.985);
+}
+
+/* 上部アクセント：くっきり太め */
+.narrator-caption::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: linear-gradient(90deg,
+    var(--terracotta-deep) 0%,
+    var(--terracotta) 25%,
+    var(--clay) 50%,
+    var(--ochre) 75%,
+    color-mix(in srgb, var(--ochre) 85%, var(--terracotta)) 100%);
+  box-shadow: 0 1px 6px color-mix(in srgb, var(--terracotta) 30%, transparent);
+}
+
+/* 背景ウォッシュ（ごくわずか） */
+.narrator-caption .caption-aura {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 70% 55% at 18% 8%, color-mix(in srgb, var(--terracotta) 5%, transparent) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 88% 92%, color-mix(in srgb, var(--ochre) 5%, transparent) 0%, transparent 60%);
+  pointer-events: none;
+  border-radius: inherit;
+  z-index: -1;
+}
+
+/* ===== Avatar (left column) ===== */
+.caption-avatar {
+  flex-shrink: 0;
+  width: 56px;
+  height: 56px;
+  position: relative;
+  z-index: 1;
+  margin-top: 2px;
+  filter: drop-shadow(0 4px 10px color-mix(in srgb, var(--ink) 18%, transparent));
+  animation: avatar-idle 3.2s ease-in-out infinite;
+}
+.caption-avatar svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  /* display は各アバターの切替ルール側で制御する */
+}
+
+/* 切替：デフォルトは両方隠す → 状況に応じて片方だけ表示 */
+.avatar-narrator,
+.avatar-piyo {
+  display: none;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.narrator-caption:not(.is-piyo) .avatar-narrator {
+  display: block;
+}
+.narrator-caption.is-piyo .avatar-piyo {
+  display: block;
+}
+
+/* 発話中は弾むように揺れる */
+.narrator-caption.is-speaking .caption-avatar {
+  animation: avatar-speak .55s ease-in-out infinite;
+}
+
+@keyframes avatar-idle {
+  0%, 100% { transform: translateY(0) rotate(0); }
+  50%      { transform: translateY(-1.5px) rotate(0); }
+}
+@keyframes avatar-speak {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  25%      { transform: translateY(-2.5px) rotate(-3deg); }
+  50%      { transform: translateY(0) rotate(0deg); }
+  75%      { transform: translateY(-1px) rotate(3deg); }
+}
+
+/* まばたき（全アバター共通） */
+.caption-avatar .eye {
+  transform-origin: center;
+  animation: avatar-blink 4.5s infinite;
+}
+.caption-avatar .eye.eye-right {
+  animation-delay: 0.05s;
+}
+@keyframes avatar-blink {
+  0%, 92%, 100% { transform: scaleY(1); }
+  95%, 97%      { transform: scaleY(0.1); }
+}
+
+/* ---- Narrator：口のアニメ（smile と open を交互に） ---- */
+.avatar-narrator .mouth-open { opacity: 0; }
+.narrator-caption.is-speaking:not(.is-piyo) .avatar-narrator .mouth-smile {
+  animation: mouth-to-open .34s ease-in-out infinite alternate;
+}
+.narrator-caption.is-speaking:not(.is-piyo) .avatar-narrator .mouth-open {
+  animation: mouth-from-open .34s ease-in-out infinite alternate;
+}
+@keyframes mouth-to-open {
+  0%   { opacity: 1; }
+  100% { opacity: 0; }
+}
+@keyframes mouth-from-open {
+  0%   { opacity: 0; transform: scaleY(0.5); }
+  100% { opacity: 0.95; transform: scaleY(1); }
+}
+
+/* ---- Piyo：くちばしが開閉 ---- */
+.avatar-piyo .beak {
+  transform-origin: 32px 27px;
+}
+.avatar-piyo .beak-top {
+  transform-origin: 32px 28px;
+  transform: scaleY(1);
+  transition: transform .25s ease;
+}
+.avatar-piyo .beak-bottom {
+  transform-origin: 32px 28px;
+  transform: scaleY(0);
+  transition: transform .25s ease;
+}
+.narrator-caption.is-piyo.is-speaking .avatar-piyo .beak-top {
+  animation: piyo-chirp-top .28s ease-in-out infinite alternate;
+}
+.narrator-caption.is-piyo.is-speaking .avatar-piyo .beak-bottom {
+  animation: piyo-chirp-bottom .28s ease-in-out infinite alternate;
+}
+@keyframes piyo-chirp-top {
+  0%   { transform: scaleY(1) translateY(0); }
+  100% { transform: scaleY(0.55) translateY(-1.5px); }
+}
+@keyframes piyo-chirp-bottom {
+  0%   { transform: scaleY(0); }
+  100% { transform: scaleY(1) translateY(1.5px); }
+}
+/* Piyo 翼がふるえる */
+.narrator-caption.is-piyo.is-speaking .avatar-piyo .wing-left {
+  transform-origin: 14px 40px;
+  transform-box: fill-box;
+  animation: wing-flap-left .32s ease-in-out infinite alternate;
+}
+.narrator-caption.is-piyo.is-speaking .avatar-piyo .wing-right {
+  transform-origin: 52px 40px;
+  transform-box: fill-box;
+  animation: wing-flap-right .32s ease-in-out infinite alternate;
+}
+@keyframes wing-flap-left {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(-22deg); }
+}
+@keyframes wing-flap-right {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(20deg); }
+}
+
+
+/* ===== Right column (meta + body) ===== */
+.caption-content {
+  flex: 1;
+  min-width: 0;
+}
+
+/* × 閉じるボタン */
+.caption-close {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid color-mix(in srgb, var(--ink) 15%, transparent);
+  background: color-mix(in srgb, var(--paper) 85%, transparent);
+  color: var(--muted);
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  z-index: 2;
+  transition: background .2s ease, color .2s ease, border-color .2s ease, transform .2s ease;
+}
+.caption-close:hover {
+  background: var(--terracotta);
+  color: #FFFBF4;
+  border-color: var(--terracotta);
+  transform: scale(1.08);
+}
+
+.caption-meta {
+  position: relative;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--terracotta-deep);
+  font-weight: 700;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.caption-meta::before {
+  content: '';
+  width: 7px; height: 7px;
+  background: var(--terracotta);
+  border-radius: 50%;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--terracotta) 22%, transparent);
+  animation: caption-pulse 2.2s ease-in-out infinite;
+  flex-shrink: 0;
+}
+.caption-meta::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg,
+    color-mix(in srgb, var(--terracotta) 45%, transparent) 0%,
+    transparent 100%);
+}
+@keyframes caption-pulse {
+  0%, 100% { box-shadow: 0 0 0 4px color-mix(in srgb, var(--terracotta) 22%, transparent); }
+  50%      { box-shadow: 0 0 0 8px color-mix(in srgb, var(--terracotta) 8%, transparent); }
+}
+
+.caption-body {
+  position: relative;
+  font-family: var(--jp-serif);
+  font-size: 21px;
+  line-height: 1.85;
+  color: var(--muted-2);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  text-align: left;
+  min-height: 1.85em;
+  transition: opacity .26s ease, transform .32s cubic-bezier(.2,.8,.2,1);
+}
+
+/* ===== 文節：3状態（future / active / past） =====
+   全状態で background-clip: text の単一メカニズムを使い、
+   --progress の値だけで「未読 → 染み中 → 既読」を表現する。
+   これにより状態切替時に文字が一瞬消える問題を排除。 */
+.caption-phrase {
+  --progress: -10%;   /* 既定：未発話（インクが届いてない） */
+  display: inline-block;
+  position: relative;
+  padding: 3px 6px;
+  margin: 0 1px;
+  border-radius: 6px;
+  color: transparent;
+  background-image: linear-gradient(
+    90deg,
+    var(--ink) 0%,
+    var(--ink) calc(var(--progress) - 6%),
+    color-mix(in srgb, var(--muted) 40%, var(--ink-2)) calc(var(--progress) + 6%),
+    color-mix(in srgb, var(--muted) 40%, var(--ink-2)) 100%
+  );
+  -webkit-background-clip: text;
+          background-clip: text;
+  opacity: 0.32;
+  transform: translateY(0);
+  transition:
+    opacity .5s cubic-bezier(.2,.8,.2,1),
+    transform .5s cubic-bezier(.2,.8,.2,1),
+    letter-spacing .4s ease,
+    --progress .18s linear;
+  white-space: nowrap;
+  transition-delay: var(--d, 0ms);
+  will-change: transform, opacity;
+  z-index: 0;
+}
+
+/* スポットライト（常に配置、透明度だけ切替）— フェードアウトを滑らかに */
+.caption-phrase::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--terracotta) 10%, transparent) 0%,
+    color-mix(in srgb, var(--ochre) 6%, transparent) 100%);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--terracotta) 22%, transparent),
+    0 6px 18px -6px color-mix(in srgb, var(--terracotta) 28%, transparent);
+  opacity: 0;
+  transition: opacity .4s ease;
+  pointer-events: none;
+}
+
+/* 読み終わった文節：完全にインク色 */
+.caption-phrase.past {
+  --progress: 112%;
+  opacity: 0.88;
+  transition-delay: 0ms;
+}
+
+/* アクティブ文節：スポットライト ON + JS が --progress を更新 */
+.caption-phrase.active {
+  opacity: 1;
+  transform: translateY(-1px);
+  letter-spacing: 0.028em;
+  transition-delay: 0ms;
+}
+.caption-phrase.active::before {
+  opacity: 1;
+}
+
+/* 未発話（future）はベースそのまま（--progress: -10%, opacity 0.32） */
+
+/* ---- Piyo バリアント ---- */
+.narrator-caption.is-piyo {
+  background: linear-gradient(135deg,
+    color-mix(in srgb, var(--cream) 55%, var(--paper)) 0%,
+    color-mix(in srgb, var(--paper) 95%, var(--cream)) 100%);
+  border-color: color-mix(in srgb, var(--ochre) 38%, transparent);
+  box-shadow:
+    0 60px 120px -40px color-mix(in srgb, var(--ochre) 45%, transparent),
+    0 24px 50px -18px color-mix(in srgb, var(--ink) 22%, transparent),
+    0 2px 0 color-mix(in srgb, var(--ink) 5%, transparent),
+    inset 0 1px 0 color-mix(in srgb, #fff 55%, transparent),
+    inset 0 0 0 1px color-mix(in srgb, var(--ochre) 10%, transparent);
+}
+.narrator-caption.is-piyo::before {
+  background: linear-gradient(90deg,
+    transparent 0%,
+    color-mix(in srgb, var(--ochre) 95%, transparent) 18%,
+    var(--clay) 50%,
+    color-mix(in srgb, var(--terracotta) 95%, transparent) 82%,
+    transparent 100%);
+}
+.narrator-caption.is-piyo .caption-meta {
+  color: color-mix(in srgb, var(--ochre) 85%, var(--terracotta-deep));
+}
+.narrator-caption.is-piyo .caption-meta::before {
+  background: var(--ochre);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--ochre) 25%, transparent);
+  animation-name: caption-pulse-ochre;
+}
+@keyframes caption-pulse-ochre {
+  0%, 100% { box-shadow: 0 0 0 4px color-mix(in srgb, var(--ochre) 25%, transparent); }
+  50%      { box-shadow: 0 0 0 8px color-mix(in srgb, var(--ochre) 8%, transparent); }
+}
+.narrator-caption.is-piyo .caption-meta::after {
+  background: linear-gradient(90deg,
+    color-mix(in srgb, var(--ochre) 55%, transparent) 0%,
+    transparent 100%);
+}
+.narrator-caption.is-piyo .caption-body {
+  font-family: var(--sans);
+  font-style: italic;
+  font-size: 19px;
+  line-height: 1.8;
+  font-weight: 500;
+}
+.narrator-caption.is-piyo .caption-phrase {
+  background-image: linear-gradient(
+    90deg,
+    var(--ink) 0%,
+    var(--ink) calc(var(--progress) - 6%),
+    color-mix(in srgb, var(--muted) 45%, var(--ink-2)) calc(var(--progress) + 6%),
+    color-mix(in srgb, var(--muted) 45%, var(--ink-2)) 100%
+  );
+}
+.narrator-caption.is-piyo .caption-phrase::before {
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--ochre) 15%, transparent) 0%,
+    color-mix(in srgb, var(--clay) 8%, transparent) 100%);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--ochre) 32%, transparent),
+    0 6px 18px -6px color-mix(in srgb, var(--ochre) 38%, transparent);
+}
+
+/* ---- 見出しバリアント ---- */
+.narrator-caption.is-heading .caption-body {
+  font-size: 28px;
+  font-weight: 600;
+  text-align: center;
+  line-height: 1.5;
+  letter-spacing: 0.025em;
+  padding: 4px 0 6px;
+}
+.narrator-caption.is-heading .caption-phrase {
+  padding: 4px 8px;
+  border-radius: 8px;
+}
+
+/* ---- サブタイトル ---- */
+.narrator-caption.is-subtitle .caption-body {
+  font-size: 19px;
+  font-weight: 400;
+  text-align: center;
+  font-style: italic;
+  color: var(--muted);
+  line-height: 1.75;
+}
+
+/* ---- CC ボタン active ---- */
+.narrator-bar .cc {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+  border: 1px solid var(--rule);
+}
+.narrator-bar .cc.active {
+  background: color-mix(in srgb, var(--terracotta) 14%, transparent);
+  color: var(--terracotta-deep);
+  border-color: color-mix(in srgb, var(--terracotta) 40%, transparent);
+}
+
+/* ---- Dark テーマ調整 ---- */
+[data-theme="dark"] .narrator-caption {
+  background: var(--bg-elevated);
+  border-color: color-mix(in srgb, var(--rule-strong) 80%, transparent);
+}
+[data-theme="dark"] .narrator-caption.is-piyo {
+  background: linear-gradient(135deg,
+    color-mix(in srgb, var(--cream) 75%, var(--bg-elevated)) 0%,
+    var(--bg-elevated) 100%);
+}
+[data-theme="dark"] .caption-phrase.past {
+  color: var(--ink);
+  opacity: 0.88;
+}
+/* Dark 用のスポットライト（::before のみ。text 用 background-image は上書きしない） */
+[data-theme="dark"] .caption-phrase::before {
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--terracotta) 22%, transparent) 0%,
+    color-mix(in srgb, var(--ochre) 12%, transparent) 100%);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--terracotta) 34%, transparent),
+    0 6px 20px -6px color-mix(in srgb, var(--terracotta) 45%, transparent);
+}
+
+/* ---- モバイル ---- */
+@media (max-width: 720px) {
+  .narrator-bar {
+    min-width: 0;
+    width: calc(100vw - 24px);
+    padding: 8px 12px;
+    gap: 6px;
+  }
+  .narrator-bar .now { display: none; }
+  .narrator-bar .time { min-width: 70px; font-size: 11px; }
+
+  .narrator-caption {
+    top: 14px;
+    padding: 18px 16px 14px;
+    width: calc(100vw - 16px);
+    border-radius: 14px;
+    gap: 12px;
+  }
+  .caption-avatar {
+    width: 44px;
+    height: 44px;
+  }
+  .caption-body { font-size: 18px; line-height: 1.85; }
+  .narrator-caption.is-heading .caption-body { font-size: 22px; }
+  .caption-meta { font-size: 9.5px; margin-bottom: 12px; }
+  .caption-phrase { padding: 3px 5px; }
+}
+
+/* ================= Living Background (canvas) ================= */
+
+.living-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 1.5s ease;
+  mix-blend-mode: screen;
+}
+html.theater-mode.theater-on .living-bg { opacity: 1; }
+
+/* living-bg を表示させるため、本文を z-index で上に浮かす */
+html.theater-mode body > main,
+html.theater-mode body > header,
+html.theater-mode body > footer {
+  position: relative;
+  z-index: 1;
+}
+
+/* ================= Theater Mode & Chapter Palette ================= */
+
+/* 章ごとに滑らかに変化するアクセント色（スポットライトとヴィネット用） */
+@property --theater-accent {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #E8B15A;
+}
+@property --theater-accent-soft {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #F0C988;
+}
+
+html {
+  transition: --theater-accent 2.4s ease, --theater-accent-soft 2.4s ease;
+}
+
+/* 章パレット（朝→昼→夕→夜のような色彩遷移） */
+html[data-chapter="intro"]          { --theater-accent: #E8B15A; --theater-accent-soft: #F4D29A; }
+html[data-chapter="speaker"]        { --theater-accent: #EE9A88; --theater-accent-soft: #F7C3B6; }
+html[data-chapter="mental-model"]   { --theater-accent: #7AB8D8; --theater-accent-soft: #ADD2E6; }
+html[data-chapter="under-hood"]     { --theater-accent: #4FA595; --theater-accent-soft: #8EC6BB; }
+html[data-chapter="use-cases"]      { --theater-accent: #9FBF6F; --theater-accent-soft: #C3D89E; }
+html[data-chapter="best-practices"] { --theater-accent: #D68A3A; --theater-accent-soft: #ECB472; }
+html[data-chapter="workflows"]      { --theater-accent: #A084C8; --theater-accent-soft: #C4B0DC; }
+html[data-chapter="advanced"]       { --theater-accent: #7A6BB3; --theater-accent-soft: #A89CD1; }
+html[data-chapter="whats-new"]      { --theater-accent: #D87E8A; --theater-accent-soft: #EAADB5; }
+html[data-chapter="qa"]             { --theater-accent: #C6A36A; --theater-accent-soft: #E0CB9F; }
+html[data-chapter="checklist"]      { --theater-accent: #9B8E7E; --theater-accent-soft: #C2B8AA; }
+
+/* ヴィネット（シアターモード時のみ） */
+html.theater-mode::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 45%,
+      transparent 0%,
+      color-mix(in srgb, var(--theater-accent) 6%, transparent) 45%,
+      color-mix(in srgb, var(--bg) 40%, #000) 100%);
+  opacity: 0;
+  transition: opacity 1.2s ease;
+}
+html.theater-mode.theater-on::before { opacity: 1; }
+
+/* シアターモード中は、未再生・再生済み以外のブロックをやわらかく沈める */
+html.theater-mode [data-narr-id] {
+  transition: opacity 0.7s ease, filter 0.7s ease,
+              background-color .4s ease, box-shadow .6s ease;
+  opacity: 0.32;
+  filter: blur(0.3px) saturate(0.85);
+}
+html.theater-mode [data-narr-id].narr-past {
+  opacity: 0.45;
+  filter: blur(0.2px) saturate(0.8);
+}
+html.theater-mode [data-narr-id].narr-active {
+  opacity: 1;
+  filter: none;
+  position: relative;
+  z-index: 2;
+}
+
+/* アクティブブロックを章パレットで照らす（左のバーとソフトグロー） */
+html.theater-mode [data-narr-id].narr-active {
+  background: linear-gradient(
+    to right,
+    color-mix(in srgb, var(--theater-accent) 22%, transparent) 0%,
+    color-mix(in srgb, var(--theater-accent) 8%, transparent) 55%,
+    transparent 100%);
+  box-shadow:
+    inset 3px 0 0 var(--theater-accent),
+    0 0 60px -10px color-mix(in srgb, var(--theater-accent-soft) 55%, transparent),
+    0 0 120px -20px color-mix(in srgb, var(--theater-accent) 35%, transparent);
+}
+
+/* piyo ブロックはアクセントをひよこ寄りに */
+html.theater-mode .piyo-bubble.narr-active {
+  background: linear-gradient(
+    to right,
+    color-mix(in srgb, var(--ochre) 25%, transparent) 0%,
+    color-mix(in srgb, var(--ochre) 10%, transparent) 55%,
+    transparent 100%);
+  box-shadow:
+    inset 3px 0 0 var(--ochre),
+    0 0 60px -10px color-mix(in srgb, var(--ochre) 50%, transparent);
+}
+
+/* シアターモード中の本文背景・色を映画館寄りに */
+html.theater-mode.theater-on body {
+  transition: background-color 1.6s ease;
+  background: color-mix(in srgb, var(--bg) 82%, #1a1410);
+}
+
+/* モーション抑制設定を尊重 */
+@media (prefers-reduced-motion: reduce) {
+  html.theater-mode [data-narr-id],
+  html.theater-mode::before,
+  html { transition: none !important; }
+}
+
+/* ================= Chapter Transition (Netflix 風) ================= */
+
+.chapter-transition {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(ellipse 70% 50% at 50% 50%,
+      color-mix(in srgb, var(--theater-accent) 28%, #08060f) 0%,
+      color-mix(in srgb, var(--theater-accent) 6%, #06050a) 60%,
+      #06050a 100%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.45s ease;
+}
+
+.chapter-transition.is-visible {
+  opacity: 1;
+  pointer-events: auto;  /* クリックでスキップ可 */
+  cursor: pointer;
+}
+
+/* 背景の上に走る縦線（映画の章扉っぽさ） */
+.chapter-transition::before,
+.chapter-transition::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: linear-gradient(to bottom,
+    transparent 0%,
+    color-mix(in srgb, var(--theater-accent) 60%, transparent) 30%,
+    color-mix(in srgb, var(--theater-accent) 60%, transparent) 70%,
+    transparent 100%);
+  opacity: 0;
+}
+.chapter-transition::before { left: calc(50% - min(40vw, 520px)); }
+.chapter-transition::after  { right: calc(50% - min(40vw, 520px)); }
+.chapter-transition.is-visible::before,
+.chapter-transition.is-visible::after {
+  animation: ctBarIn 0.7s cubic-bezier(0.2, 0.8, 0.3, 1) 0.1s forwards;
+}
+@keyframes ctBarIn {
+  0%   { opacity: 0; transform: scaleY(0.3); }
+  100% { opacity: 1; transform: scaleY(1); }
+}
+
+.ct-inner {
+  text-align: center;
+  color: #f3ecdc;
+  padding: 0 40px;
+}
+
+.ct-eyebrow {
+  font-family: 'JetBrains Mono', var(--mono), monospace;
+  font-size: clamp(10px, 0.9vw, 13px);
+  letter-spacing: 0.42em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--theater-accent-soft) 85%, #fff);
+  margin-bottom: 22px;
+  opacity: 0;
+  transform: translateY(-6px);
+}
+.chapter-transition.is-visible .ct-eyebrow {
+  animation: ctFadeDown 0.55s cubic-bezier(0.2, 0.8, 0.3, 1) 0.15s forwards;
+}
+
+.ct-num {
+  font-family: 'EB Garamond', Georgia, 'Shippori Mincho', serif;
+  font-size: clamp(130px, 20vw, 260px);
+  font-weight: 400;
+  font-style: italic;
+  letter-spacing: -0.04em;
+  line-height: 0.9;
+  color: var(--theater-accent);
+  text-shadow:
+    0 0 60px color-mix(in srgb, var(--theater-accent) 55%, transparent),
+    0 0 140px color-mix(in srgb, var(--theater-accent-soft) 30%, transparent);
+  opacity: 0;
+  transform: translateY(30px) scale(0.94);
+}
+.chapter-transition.is-visible .ct-num {
+  animation: ctNumIn 0.85s cubic-bezier(0.18, 0.9, 0.26, 1.12) 0.3s forwards;
+}
+@keyframes ctNumIn {
+  0%   { opacity: 0; transform: translateY(30px) scale(0.94); letter-spacing: 0.05em; }
+  60%  { opacity: 1; transform: translateY(-4px) scale(1.02); letter-spacing: -0.04em; }
+  100% { opacity: 1; transform: translateY(0) scale(1); letter-spacing: -0.04em; }
+}
+
+.ct-line {
+  width: 0;
+  height: 1.5px;
+  margin: 20px auto 24px;
+  background: linear-gradient(to right,
+    transparent,
+    color-mix(in srgb, var(--theater-accent) 80%, transparent) 50%,
+    transparent);
+}
+.chapter-transition.is-visible .ct-line {
+  animation: ctLineIn 0.7s cubic-bezier(0.4, 0, 0.2, 1) 0.85s forwards;
+}
+@keyframes ctLineIn {
+  0%   { width: 0; }
+  100% { width: min(180px, 28vw); }
+}
+
+.ct-jp {
+  font-family: 'Shippori Mincho', 'Noto Serif JP', serif;
+  font-size: clamp(30px, 4.5vw, 56px);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  color: #f7ecda;
+  line-height: 1.3;
+  opacity: 0;
+  transform: translateY(18px);
+}
+.chapter-transition.is-visible .ct-jp {
+  animation: ctFadeUp 0.65s cubic-bezier(0.2, 0.8, 0.3, 1) 1.05s forwards;
+}
+
+.ct-en {
+  margin-top: 18px;
+  font-family: 'Inter Tight', -apple-system, sans-serif;
+  font-size: clamp(11px, 1.1vw, 15px);
+  font-weight: 500;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, #f3ecdc 70%, var(--theater-accent-soft));
+  opacity: 0;
+  transform: translateY(8px);
+}
+.chapter-transition.is-visible .ct-en {
+  animation: ctFadeUp 0.55s cubic-bezier(0.2, 0.8, 0.3, 1) 1.35s forwards;
+}
+
+@keyframes ctFadeUp {
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes ctFadeDown {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* スキップヒント（右下に小さく） */
+.ct-skip-hint {
+  position: absolute;
+  right: 24px;
+  bottom: 22px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  color: rgba(243, 236, 220, 0.45);
+  opacity: 0;
+  text-transform: uppercase;
+}
+.chapter-transition.is-visible .ct-skip-hint {
+  animation: ctFadeIn 0.5s ease 1.6s forwards;
+}
+@keyframes ctFadeIn { to { opacity: 1; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .chapter-transition,
+  .chapter-transition * {
+    animation: none !important;
+    transition: opacity 0.2s ease !important;
+  }
+  .chapter-transition.is-visible .ct-num,
+  .chapter-transition.is-visible .ct-jp,
+  .chapter-transition.is-visible .ct-en,
+  .chapter-transition.is-visible .ct-eyebrow { opacity: 1; transform: none; }
+  .chapter-transition.is-visible .ct-line { width: 180px; }
+}
+
+/* ================= Opening Cinema ================= */
+
+.opening-cinema {
+  position: fixed;
+  inset: 0;
+  z-index: 10001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(ellipse 80% 55% at 50% 48%,
+      #1a120c 0%,
+      #0b0706 55%,
+      #040303 100%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.7s ease;
+  overflow: hidden;
+}
+.opening-cinema.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+/* 背景グロー（柔らかいスポット） */
+.opening-cinema::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 120vmax;
+  height: 120vmax;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(circle at center,
+    rgba(220, 170, 100, 0.15) 0%,
+    rgba(200, 120, 80, 0.05) 30%,
+    transparent 55%);
+  opacity: 0;
+  animation: ocBloom 6s ease-out 0.4s forwards;
+}
+@keyframes ocBloom {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.85); }
+  40% { opacity: 1; transform: translate(-50%, -50%) scale(1.0); }
+  100% { opacity: 0.7; transform: translate(-50%, -50%) scale(1.2); }
+}
+
+.oc-inner {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  color: #f3ecdc;
+  max-width: 90vw;
+  padding: 0 40px;
+}
+
+.oc-eyebrow {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: clamp(14px, 1.35vw, 20px);
+  font-weight: 500;
+  letter-spacing: 0.45em;
+  text-transform: uppercase;
+  color: #e5bb7a;
+  margin-bottom: 44px;
+  opacity: 0;
+  transform: translateY(-8px);
+}
+.opening-cinema.is-visible .oc-eyebrow {
+  animation: ocFadeDown 0.7s cubic-bezier(0.2, 0.8, 0.3, 1) 0.4s forwards;
+}
+
+.oc-title-jp {
+  font-family: 'EB Garamond', 'Shippori Mincho', Georgia, serif;
+  font-size: clamp(56px, 9vw, 140px);
+  font-weight: 400;
+  font-style: italic;
+  letter-spacing: -0.02em;
+  line-height: 0.95;
+  color: #f7ecda;
+  opacity: 0;
+  transform: translateY(30px) scale(0.96);
+}
+.opening-cinema.is-visible .oc-title-jp {
+  animation: ocTitleIn 1.1s cubic-bezier(0.2, 0.85, 0.25, 1.02) 0.85s forwards;
+}
+
+.oc-title-accent {
+  font-family: 'Shippori Mincho', 'Noto Serif JP', serif;
+  font-size: clamp(44px, 7vw, 108px);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  line-height: 1.0;
+  margin-top: 8px;
+  color: #e8b15a;
+  text-shadow:
+    0 0 50px rgba(232, 177, 90, 0.55),
+    0 0 120px rgba(232, 177, 90, 0.25);
+  opacity: 0;
+  transform: translateY(24px) scale(0.96);
+}
+.opening-cinema.is-visible .oc-title-accent {
+  animation: ocTitleIn 1.1s cubic-bezier(0.2, 0.85, 0.25, 1.02) 1.25s forwards;
+}
+@keyframes ocTitleIn {
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.oc-sub {
+  margin-top: 28px;
+  font-family: 'Shippori Mincho', serif;
+  font-size: clamp(18px, 1.8vw, 26px);
+  letter-spacing: 0.3em;
+  color: rgba(243, 236, 220, 0.72);
+  opacity: 0;
+  transform: translateY(10px);
+}
+.opening-cinema.is-visible .oc-sub {
+  animation: ocFadeUp 0.7s ease 1.8s forwards;
+}
+
+.oc-line {
+  width: 0;
+  height: 1.5px;
+  margin: 34px auto 26px;
+  background: linear-gradient(to right,
+    transparent, rgba(232, 177, 90, 0.75) 50%, transparent);
+}
+.opening-cinema.is-visible .oc-line {
+  animation: ocLineIn 0.8s cubic-bezier(0.4, 0, 0.2, 1) 2.2s forwards;
+}
+@keyframes ocLineIn {
+  to { width: min(260px, 40vw); }
+}
+
+.oc-credit {
+  font-family: 'Inter Tight', sans-serif;
+  font-size: clamp(16px, 1.5vw, 22px);
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  color: rgba(243, 236, 220, 0.92);
+  opacity: 0;
+  transform: translateY(8px);
+}
+.oc-credit strong {
+  color: #f3ecdc;
+  font-weight: 600;
+  background: none;
+  padding: 0;
+}
+.opening-cinema.is-visible .oc-credit {
+  animation: ocFadeUp 0.6s ease 2.6s forwards;
+}
+
+.oc-event {
+  margin-top: 14px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: clamp(13px, 1.15vw, 16px);
+  font-weight: 400;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: rgba(220, 180, 120, 0.88);
+  opacity: 0;
+  transform: translateY(6px);
+}
+.opening-cinema.is-visible .oc-event {
+  animation: ocFadeUp 0.6s ease 2.95s forwards;
+}
+
+@keyframes ocFadeUp {
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes ocFadeDown {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.oc-skip {
+  position: absolute;
+  right: 26px;
+  bottom: 24px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(243, 236, 220, 0.4);
+  opacity: 0;
+  z-index: 2;
+}
+.opening-cinema.is-visible .oc-skip {
+  animation: ocFadeUp 0.6s ease 3.4s forwards;
+}
+
+/* 薄いノイズ感（粒子っぽいテクスチャ） */
+.opening-cinema::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 20% 30%, rgba(232, 177, 90, 0.04) 0, transparent 2%),
+    radial-gradient(circle at 80% 70%, rgba(232, 177, 90, 0.03) 0, transparent 2%),
+    radial-gradient(circle at 40% 80%, rgba(232, 177, 90, 0.03) 0, transparent 2%);
+  background-size: 200px 200px, 300px 300px, 250px 250px;
+  opacity: 0.6;
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .opening-cinema,
+  .opening-cinema * {
+    animation: none !important;
+    transition: opacity 0.2s ease !important;
+  }
+  .opening-cinema.is-visible .oc-eyebrow,
+  .opening-cinema.is-visible .oc-title-jp,
+  .opening-cinema.is-visible .oc-title-accent,
+  .opening-cinema.is-visible .oc-sub,
+  .opening-cinema.is-visible .oc-credit,
+  .opening-cinema.is-visible .oc-event,
+  .opening-cinema.is-visible .oc-skip { opacity: 1; transform: none; }
+  .opening-cinema.is-visible .oc-line { width: 260px; }
+}
+
+/* ================= Ending Credits ================= */
+
+.ending-credits {
+  position: fixed;
+  inset: 0;
+  z-index: 10002;
+  background:
+    radial-gradient(ellipse 90% 70% at 50% 50%,
+      #140c08 0%,
+      #08050a 55%,
+      #030206 100%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 1.0s ease;
+  overflow: hidden;
+  cursor: pointer;
+}
+.ending-credits.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* 上下のフェードマスク（テキストが画面端で溶ける） */
+.ending-credits::before,
+.ending-credits::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 140px;
+  z-index: 2;
+  pointer-events: none;
+}
+.ending-credits::before {
+  top: 0;
+  background: linear-gradient(to bottom, #03020680 0%, transparent 100%);
+}
+.ending-credits::after {
+  bottom: 0;
+  background: linear-gradient(to top, #03020680 0%, transparent 100%);
+}
+
+.ec-reel {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  transform: translate(-50%, 100vh);
+  width: min(680px, 88vw);
+  color: #e8dcc6;
+  text-align: center;
+  padding-bottom: 80px;
+}
+.ending-credits.is-visible .ec-reel {
+  animation: ecRoll 36s linear forwards;
+}
+@keyframes ecRoll {
+  from { transform: translate(-50%, 100vh); }
+  to   { transform: translate(-50%, calc(-100% - 60px)); }
+}
+
+.ec-fin {
+  font-family: 'EB Garamond', 'Shippori Mincho', serif;
+  font-size: clamp(72px, 10vw, 140px);
+  font-weight: 400;
+  font-style: italic;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  color: #e8b15a;
+  text-shadow:
+    0 0 50px rgba(232, 177, 90, 0.45),
+    0 0 110px rgba(232, 177, 90, 0.2);
+  margin-bottom: 24px;
+}
+
+.ec-divider {
+  width: 120px;
+  height: 1px;
+  margin: 40px auto;
+  background: linear-gradient(to right, transparent, rgba(232, 177, 90, 0.6), transparent);
+}
+
+.ec-block {
+  margin: 36px 0;
+}
+
+.ec-label {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.42em;
+  text-transform: uppercase;
+  color: rgba(232, 177, 90, 0.75);
+  margin-bottom: 12px;
+}
+
+.ec-value {
+  font-family: 'Shippori Mincho', 'EB Garamond', serif;
+  font-size: clamp(22px, 2.4vw, 32px);
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  color: #f4e8d0;
+  line-height: 1.4;
+}
+.ec-value.is-small {
+  font-size: clamp(14px, 1.3vw, 18px);
+  color: rgba(232, 220, 198, 0.78);
+  font-weight: 400;
+  margin-top: 6px;
+  letter-spacing: 0.12em;
+}
+
+.ec-thanks {
+  font-family: 'Shippori Mincho', serif;
+  font-size: clamp(26px, 3.2vw, 42px);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  color: #f7eed8;
+  margin: 60px 0 24px;
+  line-height: 1.5;
+}
+.ec-note {
+  font-family: 'Inter Tight', sans-serif;
+  font-size: clamp(14px, 1.3vw, 17px);
+  line-height: 1.9;
+  color: rgba(232, 220, 198, 0.7);
+  max-width: 520px;
+  margin: 0 auto 48px;
+  letter-spacing: 0.04em;
+}
+.ec-year {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 0.5em;
+  color: rgba(232, 177, 90, 0.5);
+  margin-top: 40px;
+}
+
+.ec-skip {
+  position: absolute;
+  right: 26px;
+  bottom: 24px;
+  z-index: 3;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(232, 220, 198, 0.4);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ending-credits.is-visible .ec-reel {
+    animation: none !important;
+    transform: translate(-50%, 20vh);
+  }
+}
+
